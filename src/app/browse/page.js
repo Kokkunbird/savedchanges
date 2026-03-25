@@ -21,7 +21,6 @@ const scrambleText = (el, original) => {
 
 // --- 2. SUB-COMPONENTS ---
 
-/** Animated Loading Text */
 function TypeText({ text, speed = 40, onComplete }) {
   const [displayed, setDisplayed] = useState("");
   useEffect(() => {
@@ -35,11 +34,10 @@ function TypeText({ text, speed = 40, onComplete }) {
       }
     }, speed);
     return () => clearInterval(interval);
-  }, [text]);
+  }, [text, speed, onComplete]);
   return <p className="font-mono text-sm tracking-[0.3em] text-gray-400">{displayed}</p>;
 }
 
-/** Individual Product Card */
 function MaskCard({ product, index, onOpen }) {
   const nameRef = useRef(null);
   const ivRef = useRef(null);
@@ -53,7 +51,7 @@ function MaskCard({ product, index, onOpen }) {
       onClick={() => onOpen(product)}
     >
       <div className="mask-img-wrap">
-        {product.image ? <img src={product.image} className="mask-img" /> : <div className="mask-placeholder">IMG_NULL</div>}
+        {product.image ? <img src={product.image} alt={product.name} className="mask-img" /> : <div className="mask-placeholder">IMG_NULL</div>}
         <div className="mask-scan" /><div className="bracket tl" /><div className="bracket tr" /><div className="bracket bl" /><div className="bracket br" />
       </div>
       <div className="mask-body">
@@ -64,36 +62,25 @@ function MaskCard({ product, index, onOpen }) {
   );
 }
 
-/** Cart Drawer */
 function CartDrawer({ cart, open, onClose, onCheckout, loading }) {
-  const total = cart.reduce((s, i) => s + i.amount * i.qty, 0);
+  const total = cart.reduce((s, i) => s + (i.amount || 0) * i.qty, 0);
   const currency = cart[0]?.currency || "USD";
 
   return (
     <>
-      {/* Backdrop */}
       {open && <div className="cart-backdrop" onClick={onClose} />}
-      
-      {/* Drawer */}
       <div className={`cart-drawer ${open ? "cart-drawer--open" : ""}`}>
-        
-        {/* Header */}
         <div className="p-6 border-b border-white/10 flex justify-between items-center">
           <div className="flex flex-col">
             <span className="font-mono text-[10px] tracking-[0.3em] text-white/30">SYSTEM_MANIFEST</span>
             <span className="font-mono text-xs text-white/70">{cart.length} IDENTITIES LOADED</span>
           </div>
-          <button className="text-white/30 hover:text-white transition-colors p-2" onClick={onClose}>
-            ✕
-          </button>
+          <button className="text-white/30 hover:text-white transition-colors p-2" onClick={onClose}>✕</button>
         </div>
 
-        {/* Scrollable Items Area */}
         <div className="flex-1 overflow-y-auto p-6 space-y-4">
           {cart.length === 0 ? (
-            <div className="h-full flex items-center justify-center opacity-20 font-mono text-[10px] tracking-widest">
-              // NO_DATA_FOUND
-            </div>
+            <div className="h-full flex items-center justify-center opacity-20 font-mono text-[10px] tracking-widest">// NO_DATA_FOUND</div>
           ) : (
             cart.map((item) => (
               <div key={item.priceId} className="group border-b border-white/5 pb-4 last:border-0">
@@ -102,7 +89,7 @@ function CartDrawer({ cart, open, onClose, onCheckout, loading }) {
                     {item.name.toUpperCase()}
                   </span>
                   <span className="font-mono text-[11px] text-white/40">
-                    {((item.amount * item.qty) / 100).toFixed(2)}
+                    {(((item.amount || 0) * item.qty) / 100).toFixed(2)}
                   </span>
                 </div>
                 <div className="flex justify-between items-center text-[9px] font-mono tracking-widest text-white/20 uppercase">
@@ -114,7 +101,6 @@ function CartDrawer({ cart, open, onClose, onCheckout, loading }) {
           )}
         </div>
 
-        {/* Footer / Checkout Section */}
         {cart.length > 0 && (
           <div className="p-6 bg-white/[0.02] border-t border-white/10">
             <div className="flex justify-between items-end mb-6">
@@ -132,16 +118,10 @@ function CartDrawer({ cart, open, onClose, onCheckout, loading }) {
               onClick={onCheckout}
               disabled={loading}
             >
-              <span className="relative z-10">
-                {loading ? "ESTABLISHING_LINK..." : "PROCEED_TO_CHECKOUT →"}
-              </span>
-              {/* Subtle hover animation background */}
+              <span className="relative z-10">{loading ? "ESTABLISHING_LINK..." : "PROCEED_TO_CHECKOUT →"}</span>
               <div className="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-300 -z-0" />
             </button>
-            
-            <p className="mt-4 text-[8px] font-mono text-center text-white/10 tracking-[0.2em]">
-              SECURE_ENCRYPTION_ENABLED // STRIPE_V3
-            </p>
+            <p className="mt-4 text-[8px] font-mono text-center text-white/10 tracking-[0.2em]">SECURE_ENCRYPTION_ENABLED // STRIPE_V3</p>
           </div>
         )}
       </div>
@@ -161,7 +141,13 @@ export default function BrowsePage() {
 
   useEffect(() => {
     if (!booted) return;
-    fetch("/api/products").then(r => r.json()).then(d => { setProducts(d.products || []); setStatus("ready"); }).catch(() => setStatus("error"));
+    fetch("/api/products")
+      .then(r => r.json())
+      .then(d => { 
+        setProducts(d.products || []); 
+        setStatus("ready"); 
+      })
+      .catch(() => setStatus("error"));
   }, [booted]);
 
   const addToCart = (product) => {
@@ -174,16 +160,40 @@ export default function BrowsePage() {
     setCartOpen(true);
   };
 
+  /** UPDATED CHECKOUT LOGIC **/
   async function handleCheckout() {
+    if (cart.length === 0) return;
     setCheckingOut(true);
-    const res = await fetch("/api/checkout", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ items: cart.map(i => ({ priceId: i.priceId, quantity: i.qty })) }),
-    });
-    const data = await res.json();
-    if (data.url) window.location.href = data.url;
-    setCheckingOut(false);
+
+    try {
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          items: cart.map(i => ({ 
+            priceId: i.priceId, 
+            quantity: i.qty 
+          })) 
+        }),
+      });
+
+      const data = await res.json();
+
+      // We handle BOTH 'url' and 'id' as fallbacks
+      if (data.url) {
+        window.location.assign(data.url);
+      } else if (data.id) {
+        // Fallback if your API still returns only 'id'
+        window.location.assign(`https://checkout.stripe.com/pay/${data.id}`);
+      } else {
+        throw new Error(data.details || "Failed to create session");
+      }
+    } catch (err) {
+      console.error("Checkout Error:", err);
+      alert("CRITICAL_SYSTEM_FAILURE: Unable to establish Stripe tunnel.");
+    } finally {
+      setCheckingOut(false);
+    }
   }
 
   return (
@@ -195,7 +205,7 @@ export default function BrowsePage() {
         .mask-img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1); transition: 0.5s; }
         .mask-card:hover .mask-img { filter: grayscale(0); transform: scale(1.05); }
         .mask-body { padding: 15px; }
-        .bracket { position: absolute; width: 8px; height: 8px; border: 1px solid white; opacity: 0; transition: 0.3s; }
+        .bracket { position: absolute; width: 8px; height: 8px; border: 1px solid white; opacity: 0; transition: 0.3s; pointer-events: none; }
         .mask-card:hover .bracket { opacity: 0.4; }
         .bracket.tl { top:5px; left:5px; border-right:0; border-bottom:0; }
         .bracket.tr { top:5px; right:5px; border-left:0; border-bottom:0; }
@@ -204,7 +214,7 @@ export default function BrowsePage() {
         .cart-drawer { position:fixed; top:0; right:0; height:100vh; width:300px; z-index:150; background:#070707; border-left:1px solid #222; transform:translateX(100%); transition:0.4s cubic-bezier(0.16,1,0.3,1); display:flex; flex-direction:column; }
         .cart-drawer--open { transform:translateX(0); }
         .cart-backdrop { position:fixed; inset:0; z-index:149; background:rgba(0,0,0,0.7); }
-        .sci-acquire { border: 1px solid white; padding: 12px; font-family: monospace; transition: 0.3s; cursor:pointer; }
+        .sci-acquire { border: 1px solid white; padding: 12px; font-family: monospace; transition: 0.3s; cursor:pointer; text-align:center; }
         .sci-acquire:hover { background: white; color: black; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
       `}</style>
@@ -216,8 +226,10 @@ export default function BrowsePage() {
       ) : (
         <div className="p-10 pt-32">
           <header className="fixed top-0 left-0 w-full p-8 z-50 bg-black/80 backdrop-blur-md border-b border-white/5 flex justify-between items-center">
-             <Link href="/shop" className="font-mono text-xs opacity-40 hover:opacity-100">← BACK</Link>
-             <button onClick={() => setCartOpen(true)} className="font-mono text-xs border border-white/20 px-4 py-2 hover:border-white">CART ({cart.length})</button>
+             <Link href="/" className="font-mono text-xs opacity-40 hover:opacity-100">← EXIT_INTERFACE</Link>
+             <button onClick={() => setCartOpen(true)} className="font-mono text-xs border border-white/20 px-4 py-2 hover:border-white">
+               MANIFEST_INDEX ({cart.length})
+             </button>
           </header>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -227,16 +239,24 @@ export default function BrowsePage() {
           {selectedProduct && (
             <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/90 backdrop-blur-md p-6">
               <div className="max-w-xl w-full border border-white/10 bg-[#050505] p-8 relative">
-                <button onClick={() => setSelectedProduct(null)} className="absolute top-4 right-6 text-white/30 font-mono text-xs">✕ CLOSE</button>
-                <img src={selectedProduct.image} className="w-full aspect-square object-cover mb-6" />
-                <h2 className="text-2xl font-mono mb-2">{selectedProduct.name.toUpperCase()}</h2>
-                <p className="text-white/40 mb-8 text-sm">{selectedProduct.description}</p>
-                <button className="sci-acquire w-full" onClick={() => addToCart(selectedProduct)}>ACQUIRE IDENTITY</button>
+                <button onClick={() => setSelectedProduct(null)} className="absolute top-4 right-6 text-white/30 font-mono text-xs hover:text-white transition-colors">✕ CLOSE</button>
+                <img src={selectedProduct.image} alt={selectedProduct.name} className="w-full aspect-square object-cover mb-6 border border-white/5" />
+                <h2 className="text-2xl font-mono mb-2 tracking-tighter">{selectedProduct.name.toUpperCase()}</h2>
+                <p className="text-white/40 mb-8 text-sm font-mono leading-relaxed">{selectedProduct.description}</p>
+                <button className="sci-acquire w-full font-mono text-xs tracking-[0.2em]" onClick={() => addToCart(selectedProduct)}>
+                  ACQUIRE_IDENTITY
+                </button>
               </div>
             </div>
           )}
 
-          <CartDrawer cart={cart} open={cartOpen} onClose={() => setCartOpen(false)} onCheckout={handleCheckout} loading={checkingOut} />
+          <CartDrawer 
+            cart={cart} 
+            open={cartOpen} 
+            onClose={() => setCartOpen(false)} 
+            onCheckout={handleCheckout} 
+            loading={checkingOut} 
+          />
         </div>
       )}
     </div>
