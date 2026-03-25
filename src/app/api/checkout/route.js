@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 
-// 1. Lazy-load Stripe to prevent build-time errors in Netlify
 let stripe;
 
 export async function POST(req) {
@@ -17,16 +16,13 @@ export async function POST(req) {
     const body = await req.json();
     const { items } = body;
 
-    // Log the data to Netlify Functions Console so we can track the payload
     console.log("Incoming Cart Items:", JSON.stringify(items));
 
     if (!items || !Array.isArray(items) || items.length === 0) {
       return NextResponse.json({ error: "Cart is empty" }, { status: 400 });
     }
 
-    // 2. Map items based on what the frontend actually sends
     const lineItems = items.map((item) => {
-      // If the frontend sends a Stripe Price ID (Preferred)
       if (item.priceId) {
         return {
           price: item.priceId,
@@ -34,9 +30,8 @@ export async function POST(req) {
         };
       }
 
-      // FALLBACK: If the frontend sends a raw numeric price
-      const rawPrice = typeof item.price === 'string' 
-        ? parseFloat(item.price.replace(/[^0-9.]/g, "")) 
+      const rawPrice = typeof item.price === "string"
+        ? parseFloat(item.price.replace(/[^0-9.]/g, ""))
         : item.price;
 
       return {
@@ -45,13 +40,12 @@ export async function POST(req) {
           product_data: {
             name: item.name || "Archive Item",
           },
-          unit_amount: Math.round((rawPrice || 1.00) * 100),
+          unit_amount: Math.round((rawPrice || 1.0) * 100),
         },
         quantity: item.quantity || 1,
       };
     });
 
-    // 3. Create the Session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       line_items: lineItems,
@@ -60,7 +54,8 @@ export async function POST(req) {
       cancel_url: `${req.headers.get("origin")}/shop`,
     });
 
-    return NextResponse.json({ id: session.id });
+    // ✅ Return session.url so the frontend can redirect directly
+    return NextResponse.json({ url: session.url });
 
   } catch (err) {
     console.error("STRIPE_SERVER_ERROR:", err.message);

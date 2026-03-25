@@ -43,8 +43,8 @@ function MaskCard({ product, index, onOpen }) {
   const ivRef = useRef(null);
 
   return (
-    <div 
-      className="mask-card cursor-pointer" 
+    <div
+      className="mask-card cursor-pointer"
       style={{ animationDelay: `${index * 0.1}s` }}
       onMouseEnter={() => { ivRef.current = scrambleText(nameRef.current, product.name.toUpperCase()); }}
       onMouseLeave={() => { clearInterval(ivRef.current); if (nameRef.current) nameRef.current.textContent = product.name.toUpperCase(); }}
@@ -110,10 +110,10 @@ function CartDrawer({ cart, open, onClose, onCheckout, loading }) {
                 {(total / 100).toFixed(2)}
               </span>
             </div>
-            
-            <button 
+
+            <button
               className={`w-full py-4 font-mono text-[11px] tracking-[0.3em] transition-all duration-500 relative overflow-hidden group
-                ${loading ? 'bg-white/10 text-white/40 cursor-wait' : 'bg-white text-black hover:bg-transparent hover:text-white border border-white'}
+                ${loading ? "bg-white/10 text-white/40 cursor-wait" : "bg-white text-black hover:bg-transparent hover:text-white border border-white"}
               `}
               onClick={onCheckout}
               disabled={loading}
@@ -143,9 +143,9 @@ export default function BrowsePage() {
     if (!booted) return;
     fetch("/api/products")
       .then(r => r.json())
-      .then(d => { 
-        setProducts(d.products || []); 
-        setStatus("ready"); 
+      .then(d => {
+        setProducts(d.products || []);
+        setStatus("ready");
       })
       .catch(() => setStatus("error"));
   }, [booted]);
@@ -160,7 +160,7 @@ export default function BrowsePage() {
     setCartOpen(true);
   };
 
-  /** UPDATED CHECKOUT LOGIC **/
+  // ✅ FIXED CHECKOUT — uses session.url returned from route.js
   async function handleCheckout() {
     if (cart.length === 0) return;
     setCheckingOut(true);
@@ -169,24 +169,21 @@ export default function BrowsePage() {
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          items: cart.map(i => ({ 
-            priceId: i.priceId, 
-            quantity: i.qty 
-          })) 
+        body: JSON.stringify({
+          items: cart.map(i => ({
+            priceId: i.priceId,
+            quantity: i.qty,
+          })),
         }),
       });
 
       const data = await res.json();
 
-      // We handle BOTH 'url' and 'id' as fallbacks
       if (data.url) {
+        // ✅ Redirect directly to Stripe hosted checkout
         window.location.assign(data.url);
-      } else if (data.id) {
-        // Fallback if your API still returns only 'id'
-        window.location.assign(`https://checkout.stripe.com/pay/${data.id}`);
       } else {
-        throw new Error(data.details || "Failed to create session");
+        throw new Error(data.details || data.error || "No checkout URL returned");
       }
     } catch (err) {
       console.error("Checkout Error:", err);
@@ -226,10 +223,10 @@ export default function BrowsePage() {
       ) : (
         <div className="p-10 pt-32">
           <header className="fixed top-0 left-0 w-full p-8 z-50 bg-black/80 backdrop-blur-md border-b border-white/5 flex justify-between items-center">
-             <Link href="/" className="font-mono text-xs opacity-40 hover:opacity-100">← EXIT_INTERFACE</Link>
-             <button onClick={() => setCartOpen(true)} className="font-mono text-xs border border-white/20 px-4 py-2 hover:border-white">
-               MANIFEST_INDEX ({cart.length})
-             </button>
+            <Link href="/" className="font-mono text-xs opacity-40 hover:opacity-100">← EXIT_INTERFACE</Link>
+            <button onClick={() => setCartOpen(true)} className="font-mono text-xs border border-white/20 px-4 py-2 hover:border-white">
+              MANIFEST_INDEX ({cart.length})
+            </button>
           </header>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -250,12 +247,12 @@ export default function BrowsePage() {
             </div>
           )}
 
-          <CartDrawer 
-            cart={cart} 
-            open={cartOpen} 
-            onClose={() => setCartOpen(false)} 
-            onCheckout={handleCheckout} 
-            loading={checkingOut} 
+          <CartDrawer
+            cart={cart}
+            open={cartOpen}
+            onClose={() => setCartOpen(false)}
+            onCheckout={handleCheckout}
+            loading={checkingOut}
           />
         </div>
       )}
