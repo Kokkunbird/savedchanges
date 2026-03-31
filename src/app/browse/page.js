@@ -160,7 +160,6 @@ export default function BrowsePage() {
     setCartOpen(true);
   };
 
-  // ✅ FIXED CHECKOUT — uses session.url returned from route.js
   async function handleCheckout() {
     if (cart.length === 0) return;
     setCheckingOut(true);
@@ -180,7 +179,6 @@ export default function BrowsePage() {
       const data = await res.json();
 
       if (data.url) {
-        // ✅ Redirect directly to Stripe hosted checkout
         window.location.assign(data.url);
       } else {
         throw new Error(data.details || data.error || "No checkout URL returned");
@@ -223,7 +221,8 @@ export default function BrowsePage() {
       ) : (
         <div className="p-10 pt-32">
           <header className="fixed top-0 left-0 w-full p-8 z-50 bg-black/80 backdrop-blur-md border-b border-white/5 flex justify-between items-center">
-            <Link href="/" className="font-mono text-xs opacity-40 hover:opacity-100">← EXIT_INTERFACE</Link>
+            {/* ← Changed from "/" to "/shop" */}
+            <Link href="/shop" className="font-mono text-xs opacity-40 hover:opacity-100">← EXIT_INTERFACE</Link>
             <button onClick={() => setCartOpen(true)} className="font-mono text-xs border border-white/20 px-4 py-2 hover:border-white">
               MANIFEST_INDEX ({cart.length})
             </button>

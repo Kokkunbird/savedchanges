@@ -53,23 +53,19 @@ function SciFiWidget({ href, label, index }) {
   );
 }
 
-/* TYPEWRITER */
 function TypeText({ text, speed = 40, onComplete }) {
   const [displayed, setDisplayed] = useState("");
 
   useEffect(() => {
     let i = 0;
-
     const interval = setInterval(() => {
       setDisplayed(text.slice(0, i));
       i++;
-
       if (i > text.length) {
         clearInterval(interval);
         if (onComplete) onComplete();
       }
     }, speed);
-
     return () => clearInterval(interval);
   }, [text]);
 
@@ -80,76 +76,106 @@ function TypeText({ text, speed = 40, onComplete }) {
   );
 }
 
+function isMobileDevice() {
+  if (typeof navigator === "undefined") return false;
+  return /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(
+    navigator.userAgent
+  );
+}
+
 export default function Shop() {
   const [step, setStep] = useState(0);
   const [showVideo, setShowVideo] = useState(false);
   const [showOverlay, setShowOverlay] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Ref so onLoadedData always sees the latest value without re-binding
+  const showVideoRef = useRef(false);
+
+  useEffect(() => {
+    const mobile = isMobileDevice();
+    setIsMobile(mobile);
+
+    const alreadySeen = sessionStorage.getItem("sc_intro_seen");
+
+    if (alreadySeen || mobile) {
+      showVideoRef.current = true;
+      setShowVideo(true);
+      setShowOverlay(true);
+    }
+  }, []);
+
+  function handleIntroComplete() {
+    sessionStorage.setItem("sc_intro_seen", "1");
+    setTimeout(() => {
+      showVideoRef.current = true;
+      setShowVideo(true);
+      // Show overlay shortly after video fades in
+      setTimeout(() => setShowOverlay(true), 800);
+    }, 600);
+  }
 
   return (
     <div className="bg-black text-white overflow-hidden">
 
-      {/* SYSTEM INTRO */}
-      {!showVideo && (
-        <div className="h-screen flex flex-col justify-center px-6 md:px-16 space-y-4">
+      {/* VIDEO — always mounted, fades in when ready */}
+      <div
+        className="fixed inset-0 z-0 transition-opacity duration-700"
+        style={{ opacity: showVideo ? 1 : 0 }}
+      >
+        <video
+          src="/video1.mp4"
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="w-full h-full object-cover"
+          onLoadedData={() => {
+            // Use ref so this callback always sees the current value
+            if (showVideoRef.current) {
+              setTimeout(() => setShowOverlay(true), 800);
+            }
+          }}
+        />
+        <div className="absolute inset-0 bg-black/40" />
+      </div>
 
+      {/* INTRO — first visit only, sits above video */}
+      {!showVideo && !showOverlay && (
+        <div className="relative z-10 h-screen flex flex-col justify-center px-6 md:px-16 space-y-4">
           {step >= 0 && (
             <TypeText
               text="INITIALIZING SYSTEM..."
               onComplete={() => setStep(1)}
             />
           )}
-
           {step >= 1 && (
             <TypeText
               text="IDENTITY STATUS: UNDEFINED"
               onComplete={() => setStep(2)}
             />
           )}
-
           {step >= 2 && (
             <TypeText
               text="RECOMMENDATION: ERASE IDENTITY"
-              onComplete={() => {
-                setTimeout(() => setShowVideo(true), 600);
-              }}
+              onComplete={handleIntroComplete}
             />
           )}
-
         </div>
       )}
 
-      {/* VIDEO + OVERLAY */}
-      {showVideo && (
-        <div className="fixed inset-0 bg-black z-50">
-
-          {/* VIDEO BACKGROUND */}
-          <video
-            src="/video1.mp4"
-            autoPlay
-            muted
-            loop
-            className="w-full h-full object-cover"
-            onLoadedData={() => {
-              setTimeout(() => setShowOverlay(true), 1200);
-            }}
-          />
-
-          {/* DARK LAYER */}
-          <div className="absolute inset-0 bg-black/40" />
-
-          {/* WIDGETS — anchored to bottom of screen */}
-          {showOverlay && (
-            <div className="absolute bottom-16 left-0 right-0 flex justify-center fade-in px-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-4xl">
-
-                <SciFiWidget href="/browse" label="BROWSE" index={1} />
-                <SciFiWidget href="/about" label="ABOUT" index={2} />
-                <SciFiWidget href="/archive" label="ARCHIVE" index={3} />
-
-              </div>
-            </div>
-          )}
-
+      {/* WIDGETS — over video, responsive layout */}
+      {showOverlay && (
+        <div className="fixed bottom-16 left-0 right-0 z-10 flex justify-center fade-in px-6">
+          <div
+            className={`grid gap-6 w-full ${
+              isMobile ? "grid-cols-1 max-w-sm" : "grid-cols-3 max-w-4xl"
+            }`}
+          >
+            <SciFiWidget href="/browse" label="BROWSE" index={1} />
+            <SciFiWidget href="/about" label="ABOUT" index={2} />
+            <SciFiWidget href="/archive" label="ARCHIVE" index={3} />
+          </div>
         </div>
       )}
 

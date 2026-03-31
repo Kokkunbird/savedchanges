@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* === ROOT (FORCE DARK BRAND) === */
+/* === ROOT === */
 :root {
   --background: #000000;
   --foreground: #ededed;
@@ -16,108 +16,58 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-
+  font-family: var(--font-geist-sans), system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   margin: 0;
 }
 
 /* ===================================== */
-/* 🔥 SYSTEM TEXT GLITCH (CLEAN + CONTROLLED) */
-/* ===================================== */
-
-.system-glitch {
-  position: relative;
-  animation: glitchText 1.2s infinite;
-}
-
-.system-glitch::before,
-.system-glitch::after {
-  content: attr(data-text);
-  position: absolute;
-  left: 0;
-  width: 100%;
-  opacity: 0.4;
-}
-
-.system-glitch::before {
-  color: #ff0000;
-  animation: glitchTop 1.2s infinite;
-}
-
-.system-glitch::after {
-  color: #00ffff;
-  animation: glitchBottom 1.2s infinite;
-}
-
-@keyframes glitchText {
-  0% { transform: translate(0); }
-  20% { transform: translate(-1px, 1px); }
-  40% { transform: translate(1px, -1px); }
-  60% { transform: translate(-1px, 1px); }
-  80% { transform: translate(1px, -1px); }
-  100% { transform: translate(0); }
-}
-
-@keyframes glitchTop {
-  0% { transform: translate(0); }
-  20% { transform: translate(-2px, -2px); }
-  40% { transform: translate(2px, 2px); }
-  100% { transform: translate(0); }
-}
-
-@keyframes glitchBottom {
-  0% { transform: translate(0); }
-  20% { transform: translate(2px, 2px); }
-  40% { transform: translate(-2px, -2px); }
-  100% { transform: translate(0); }
-}
-
-/* ===================================== */
-/* 🔥 IMAGE POP (DEPTH + PREMIUM FEEL) */
+/* ✦ IMAGE POP                           */
 /* ===================================== */
 
 .image-pop {
-  transform: scale(0.9);
-  transition: transform 0.6s ease, filter 0.6s ease, box-shadow 0.6s ease;
-  filter: brightness(0.75);
+  transform: scale(0.97);
+  transition: transform 0.5s ease, filter 0.5s ease;
+  filter: brightness(0.8);
 }
 
 .image-pop:hover {
   transform: scale(1);
-  filter: brightness(1.05);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+  filter: brightness(1);
 }
 
 /* ===================================== */
-/* ✨ OPTIONAL: FADE-IN (FOR FUTURE USE) */
+/* ✦ FADE IN                             */
 /* ===================================== */
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 .fade-in {
-  animation: fadeIn 0.6s ease forwards;
+  animation: fadeIn 0.7s ease forwards;
 }
 
+/* ===================================== */
+/* ✦ WIDGET                              */
+/* ===================================== */
+
 .widget {
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   padding: 30px;
   text-align: center;
   cursor: pointer;
-  transition: all 0.4s ease;
-
+  transition: all 0.35s ease;
   opacity: 0;
-  transform: translateY(20px);
-  animation: widgetFade 0.8s forwards;
+  transform: translateY(16px);
+  animation: widgetFade 0.7s forwards;
 }
 
-.widget:nth-child(1) { animation-delay: 0.3s; }
-.widget:nth-child(2) { animation-delay: 0.6s; }
-.widget:nth-child(3) { animation-delay: 0.9s; }
+.widget:nth-child(1) { animation-delay: 0.2s; }
+.widget:nth-child(2) { animation-delay: 0.4s; }
+.widget:nth-child(3) { animation-delay: 0.6s; }
 
 .widget:hover {
   background: white;
@@ -133,7 +83,7 @@ body {
 }
 
 /* ===================================== */
-/* ⚡ SCI-FI WIDGET — IDENTITY THEME    */
+/* ✦ SCI WIDGET — REFINED               */
 /* ===================================== */
 
 .sci-widget {
@@ -143,37 +93,18 @@ body {
   cursor: pointer;
   color: white;
   overflow: hidden;
-
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(6px);
-
   transition: border-color 0.4s ease, transform 0.4s ease, box-shadow 0.4s ease;
-
   opacity: 0;
-  transform: translateY(20px);
-  animation: sciFade 0.8s forwards;
+  transform: translateY(16px);
+  animation: sciFade 0.7s forwards;
 }
 
-/* stagger animation */
-.sci-widget:nth-child(1) { animation-delay: 0.3s; }
-.sci-widget:nth-child(2) { animation-delay: 0.6s; }
-.sci-widget:nth-child(3) { animation-delay: 0.9s; }
+.sci-widget:nth-child(1) { animation-delay: 0.2s; }
+.sci-widget:nth-child(2) { animation-delay: 0.4s; }
+.sci-widget:nth-child(3) { animation-delay: 0.6s; }
 
-/* scanning beam — sweeps top to bottom on hover */
-.sci-widget::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
-  top: -1px;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  pointer-events: none;
-}
-
-/* inner bracket inset — visible on hover */
 .sci-widget::after {
   content: "";
   position: absolute;
@@ -183,44 +114,25 @@ body {
   pointer-events: none;
 }
 
-.sci-widget:hover::before {
-  opacity: 1;
-  animation: scanLine 0.7s linear infinite;
-}
-
 .sci-widget:hover::after {
-  border-color: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
 .sci-widget:hover {
-  border-color: rgba(255, 255, 255, 0.8);
-  box-shadow: 0 0 30px rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 0 24px rgba(255, 255, 255, 0.05);
   transform: translateY(-4px);
 }
 
-/* number label */
 .sci-label {
   position: absolute;
   top: 10px;
   left: 14px;
   font-size: 10px;
-  color: rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.25);
   letter-spacing: 0.25em;
 }
 
-/* idle pulse ring — slow breathing glow on the inner border */
-.sci-pulse {
-  position: absolute;
-  inset: 0;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  animation: pulseRing 4s ease-in-out infinite;
-  pointer-events: none;
-}
-
-.sci-widget:nth-child(2) .sci-pulse { animation-delay: 1.3s; }
-.sci-widget:nth-child(3) .sci-pulse { animation-delay: 2.6s; }
-
-/* status dot — bottom-right blink */
 .sci-dot {
   position: absolute;
   bottom: 10px;
@@ -228,16 +140,12 @@ body {
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.4);
-  animation: statusBlink 2s ease-in-out infinite;
+  background: rgba(255, 255, 255, 0.3);
+  animation: statusBlink 2.5s ease-in-out infinite;
 }
 
 .sci-widget:nth-child(2) .sci-dot { animation-delay: 0.7s; }
 .sci-widget:nth-child(3) .sci-dot { animation-delay: 1.4s; }
-
-/* ===================================== */
-/* 🎞 KEYFRAMES                          */
-/* ===================================== */
 
 @keyframes sciFade {
   to {
@@ -246,20 +154,7 @@ body {
   }
 }
 
-/* scanning beam sweep */
-@keyframes scanLine {
-  0%   { top: -1px; }
-  100% { top: calc(100% + 1px); }
-}
-
-/* idle pulse ring breathing */
-@keyframes pulseRing {
-  0%, 100% { opacity: 0.4; transform: scale(1); }
-  50%       { opacity: 0.08; transform: scale(1.04); }
-}
-
-/* status dot blink */
 @keyframes statusBlink {
-  0%, 100% { opacity: 0.4; }
-  50%       { opacity: 1; }
+  0%, 100% { opacity: 0.3; }
+  50%       { opacity: 0.9; }
 }
