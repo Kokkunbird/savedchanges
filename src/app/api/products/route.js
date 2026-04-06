@@ -19,6 +19,7 @@ export async function GET() {
         priceId:     price?.id || null,
         amount:      price?.unit_amount || 0,
         currency:    price?.currency?.toUpperCase() || "SGD",
+        metadata:    product.metadata || {},
       };
     });
 

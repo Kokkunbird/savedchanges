@@ -1,407 +1,749 @@
-"use client";
+﻿"use client";
 
-import React, { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-const MASKS = [
-  { id: "01", name: "Phantom",  tag: "STEALTH SERIES",  desc: "Forged in obsidian resin. Worn by those who prefer silence." },
-  { id: "02", name: "Revenant", tag: "HERITAGE SERIES", desc: "Lacquered cedar, hand-finished. A face from another century." },
-  { id: "03", name: "Specter",  tag: "VOID SERIES",      desc: "Matte titanium alloy. The mask that wears the dark." },
+const HERO_BACKGROUNDS = ["/story4.jpg", "/story3.jpg", "/story1.jpg", "/story2.jpg"];
+
+const FEATURE_CARDS = [
+  {
+    title: "Night Market",
+    subtitle: "Shop Now",
+    path: "/shop",
+    image: "/story4.jpg",
+    icon: (
+      <svg viewBox="0 0 40 40" fill="none" aria-hidden="true">
+        <path d="M20 6C12.268 6 6 11.82 6 19c0 4.2 1.9 7.94 4.9 10.4V34h18v-4.6C31.1 26.94 34 23.2 34 19c0-7.18-6.268-13-14-13Z" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M14 22v4M20 22v4M26 22v4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+        <path d="M14 19a2 2 0 1 0 4 0 2 2 0 0 0-4 0Zm8 0a2 2 0 1 0 4 0 2 2 0 0 0-4 0Z" fill="currentColor" />
+      </svg>
+    ),
+  },
+  {
+    title: "Enter Archives",
+    subtitle: "Access: Restricted",
+    path: "/archive",
+    image: "/story3.jpg",
+    icon: (
+      <svg viewBox="0 0 40 40" fill="none" aria-hidden="true">
+        <rect x="6" y="12" width="28" height="20" rx="2" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M6 16h28" stroke="currentColor" strokeWidth="1.2" />
+        <path d="M6 12l4-4h8l2 4" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+        <rect x="14" y="20" width="12" height="2" rx="1" fill="currentColor" />
+      </svg>
+    ),
+  },
 ];
 
+const CATEGORY_ROWS = [
+  {
+    title: "Armory",
+    path: "/shop/armory",
+    icon: (
+      <svg viewBox="0 0 40 40" fill="none" aria-hidden="true">
+        <path d="M20 4L8 10v10c0 7.18 5.2 13.9 12 15.5C27.8 33.9 32 27.18 32 20V10L20 4Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+        <path d="M14 20l4 4 8-8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    ),
+  },
+  {
+    title: "Arsenal",
+    path: "/shop/arsenal",
+    icon: (
+      <svg viewBox="0 0 40 40" fill="none" aria-hidden="true">
+        <rect x="4" y="15" width="26" height="10" rx="2" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M30 18h4a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-4" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M10 25v4M16 25v4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      </svg>
+    ),
+  },
+  {
+    title: "Accessories",
+    path: "/shop/accessories",
+    icon: (
+      <svg viewBox="0 0 40 40" fill="none" aria-hidden="true">
+        <path d="M20 8C13 8 8 14 8 20s5 12 12 12 12-6 12-12S27 8 20 8Z" stroke="currentColor" strokeWidth="1.5" />
+        <circle cx="20" cy="20" r="3" stroke="currentColor" strokeWidth="1.3" />
+        <path d="M20 4v4M20 32v4M4 20h4M32 20h4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+      </svg>
+    ),
+  },
+  {
+    title: "Apparel",
+    path: "/shop/apparel",
+    icon: (
+      <svg viewBox="0 0 40 40" fill="none" aria-hidden="true">
+        <path d="M14 6h12M14 6L6 14l6 4v16h16V18l6-4-8-8" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+        <path d="M14 6c0 3.314 2.686 6 6 6s6-2.686 6-6" stroke="currentColor" strokeWidth="1.5" />
+      </svg>
+    ),
+  },
+];
+
+const PRODUCT_CARDS = [
+  {
+    name: "Cyberpunk Mask (Cyborg)",
+    price: "SGD 376.71",
+    note: "5 people have this in their basket",
+    image: "/story4.jpg",
+    position: "center 18%",
+  },
+  {
+    name: "Cyberpunk Shaman Mask",
+    price: "SGD 403.62",
+    note: "12 people have this in their basket",
+    image: "/story3.jpg",
+    position: "center 18%",
+  },
+  {
+    name: "Oni War Mask",
+    price: "SGD 428.00",
+    note: "3 people have this in their basket",
+    image: "/story1.jpg",
+    position: "center 28%",
+  },
+  {
+    name: "Hollow Smile Mask",
+    price: "SGD 392.40",
+    note: "8 people have this in their basket",
+    image: "/story2.jpg",
+    position: "center 18%",
+  },
+];
+
+function CartIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="9" cy="20" r="1.2" fill="currentColor" />
+      <circle cx="18" cy="20" r="1.2" fill="currentColor" />
+      <path d="M3 4h2l2.2 9.2a1.5 1.5 0 0 0 1.46 1.16h8.78a1.5 1.5 0 0 0 1.46-1.16L21 8H7.2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 export default function Home() {
+  const router = useRouter();
+  const [activeBackground, setActiveBackground] = useState(0);
   const [loaded, setLoaded] = useState(false);
   const [transitioning, setTransitioning] = useState(false);
-  const [activeMask, setActiveMask] = useState(0);
-  const router = useRouter();
 
   useEffect(() => {
-    const t = setTimeout(() => setLoaded(true), 80);
-    return () => clearTimeout(t);
+    const loadTimer = setTimeout(() => setLoaded(true), 120);
+    const cycleTimer = setInterval(() => {
+      setActiveBackground((current) => (current + 1) % HERO_BACKGROUNDS.length);
+    }, 4200);
+
+    return () => {
+      clearTimeout(loadTimer);
+      clearInterval(cycleTimer);
+    };
   }, []);
 
-  const handleEnter = () => {
+  function navigate(path) {
     if (transitioning) return;
     setTransitioning(true);
-    setTimeout(() => router.push("/shop"), 600);
-  };
+    setTimeout(() => router.push(path), 500);
+  }
 
   return (
-    <main style={{ background: "#000", minHeight: "100vh", color: "#fff", overflow: "hidden" }}>
+    <main className="sc-page">
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;0,700;1,300;1,700&family=DM+Sans:wght@300;400;500&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800;900&family=Barlow:wght@400;500;600;700&display=swap');
+
         :root {
-          --red: #c0392b;
-          --red-glow: rgba(192,57,43,0.55);
-          --red-dim: rgba(192,57,43,0.12);
-          --glass: rgba(255,255,255,0.03);
-          --glass-border: rgba(255,255,255,0.07);
-          --ease: cubic-bezier(0.23,1,0.32,1);
+          --bg: #060304;
+          --panel: rgba(14, 7, 8, 0.64);
+          --panel-strong: rgba(18, 7, 8, 0.84);
+          --line: rgba(201, 58, 53, 0.5);
+          --line-strong: rgba(255, 93, 84, 0.7);
+          --red: #d65047;
+          --text-dim: rgba(255, 219, 214, 0.62);
+          --ease: cubic-bezier(0.22, 1, 0.36, 1);
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: #000; overflow-x: hidden; }
 
-        .nav {
-          position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-          display: flex; justify-content: space-between; align-items: center;
-          padding: 22px 52px;
-          background: rgba(0,0,0,0.65);
-          border-bottom: 1px solid var(--glass-border);
-          backdrop-filter: blur(20px);
-          -webkit-backdrop-filter: blur(20px);
-          opacity: 0; transform: translateY(-12px);
-          transition: opacity 0.9s var(--ease), transform 0.9s var(--ease);
-          font-family: 'DM Sans', sans-serif;
+        * { box-sizing: border-box; }
+        html, body {
+          margin: 0;
+          background: #000;
+          overflow-x: hidden;
         }
-        .nav.on { opacity: 1; transform: translateY(0); }
-        .nav-logo {
-          font-family: 'Cormorant Garamond', serif;
-          font-size: 18px; font-weight: 600; letter-spacing: 0.2em;
-          color: #fff; text-transform: uppercase;
-        }
-        .nav-logo span { color: var(--red); }
-        .nav-links { display: flex; gap: 36px; align-items: center; }
-        .nav-link {
-          background: none; border: none; cursor: pointer;
-          font-family: 'DM Sans', sans-serif;
-          font-size: 11px; font-weight: 400; letter-spacing: 0.18em;
-          color: rgba(255,255,255,0.4); text-transform: uppercase;
-          transition: color 0.2s;
-        }
-        .nav-link:hover { color: #fff; }
-        .nav-cta {
-          background: var(--red); color: #fff; border: none;
-          padding: 10px 26px; font-size: 11px; font-weight: 500;
-          letter-spacing: 0.18em; text-transform: uppercase;
-          cursor: pointer; border-radius: 2px;
-          font-family: 'DM Sans', sans-serif;
-          transition: background 0.2s, box-shadow 0.25s;
-        }
-        .nav-cta:hover { background: #a93226; box-shadow: 0 0 24px var(--red-glow); }
 
-        /* HERO */
-        .hero {
-          position: relative; height: 100vh;
-          display: flex; align-items: flex-end;
+        .sc-page {
+          position: relative;
+          min-height: 100vh;
+          color: #fff6f3;
+          background: #050203;
+          font-family: 'Barlow', sans-serif;
+        }
+
+        .sc-bg-wrap {
+          position: fixed;
+          inset: 0;
+          overflow: hidden;
+          z-index: 0;
+        }
+
+        .sc-bg {
+          position: absolute;
+          inset: 0;
+          opacity: 0;
+          transition: opacity 1.2s var(--ease), transform 4.2s ease;
+          transform: scale(1.04);
+        }
+
+        .sc-bg.on {
+          opacity: 1;
+          transform: scale(1);
+        }
+
+        .sc-bg img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          object-position: center 18%;
+          filter: brightness(0.33) saturate(0.75) contrast(1.02);
+        }
+
+        .sc-bg-overlay,
+        .sc-smoke,
+        .sc-grid,
+        .sc-noise {
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+        }
+
+        .sc-bg-overlay {
+          background:
+            linear-gradient(180deg, rgba(0,0,0,0.24) 0%, rgba(0,0,0,0.56) 26%, rgba(0,0,0,0.74) 58%, rgba(0,0,0,0.92) 100%),
+            radial-gradient(circle at 22% 18%, rgba(255, 70, 60, 0.1), transparent 20%);
+        }
+
+        .sc-smoke {
+          background:
+            radial-gradient(circle at 72% 28%, rgba(255, 68, 58, 0.22), transparent 15%),
+            radial-gradient(circle at 62% 52%, rgba(255, 68, 58, 0.16), transparent 18%),
+            radial-gradient(circle at 22% 74%, rgba(255, 68, 58, 0.12), transparent 20%);
+          filter: blur(26px);
+          animation: smokeDrift 9s ease-in-out infinite alternate;
+          opacity: 0.92;
+        }
+
+        .sc-grid {
+          background:
+            linear-gradient(rgba(255, 82, 72, 0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 82, 72, 0.03) 1px, transparent 1px);
+          background-size: 34px 34px;
+          opacity: 0.22;
+        }
+
+        .sc-noise {
+          background-image:
+            radial-gradient(circle at 18% 22%, rgba(255,255,255,0.08) 0 1px, transparent 2px),
+            radial-gradient(circle at 74% 38%, rgba(255,126,111,0.08) 0 1px, transparent 2px),
+            radial-gradient(circle at 58% 76%, rgba(255,255,255,0.05) 0 1px, transparent 2px);
+          background-size: 180px 180px;
+          opacity: 0.16;
+        }
+
+        .sc-content {
+          position: relative;
+          z-index: 2;
+          width: min(100%, 1220px);
+          margin: 0 auto;
+          padding: 20px 18px 32px;
+        }
+
+        .sc-topbar {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 34px;
+          opacity: 0;
+          transform: translateY(-8px);
+          transition: opacity 0.8s var(--ease), transform 0.8s var(--ease);
+        }
+
+        .sc-topbar.on {
+          opacity: 1;
+          transform: translateY(0);
+        }
+
+        .sc-brand {
+          font-family: 'Barlow Condensed', sans-serif;
+          font-size: clamp(28px, 3vw, 36px);
+          font-weight: 800;
+          letter-spacing: 0.06em;
+          text-transform: uppercase;
+        }
+
+        .sc-cart {
+          width: 44px;
+          height: 44px;
+          border: 1px solid var(--line);
+          background: rgba(13, 6, 7, 0.7);
+          color: #fff0ec;
+          display: grid;
+          place-items: center;
+          position: relative;
+        }
+
+        .sc-cart svg {
+          width: 19px;
+          height: 19px;
+        }
+
+        .sc-cart::after {
+          content: "";
+          position: absolute;
+          top: -4px;
+          right: -4px;
+          width: 11px;
+          height: 11px;
+          border-radius: 999px;
+          background: #ff5a4d;
+          box-shadow: 0 0 12px rgba(255, 90, 77, 0.9);
+        }
+
+        .sc-hero {
+          min-height: 520px;
+          display: flex;
+          flex-direction: column;
+          justify-content: flex-start;
+          padding-top: 34px;
+        }
+
+        .sc-copy {
+          width: min(100%, 320px);
+          opacity: 0;
+          transform: translateY(12px);
+          transition: opacity 0.95s var(--ease) 0.12s, transform 0.95s var(--ease) 0.12s;
+        }
+
+        .sc-copy.on {
+          opacity: 1;
+          transform: translateY(0);
+        }
+
+        .sc-title {
+          margin: 0;
+          font-family: 'Barlow Condensed', sans-serif;
+          font-size: clamp(68px, 10vw, 124px);
+          font-weight: 900;
+          line-height: 0.88;
+          letter-spacing: 0.02em;
+          text-transform: uppercase;
+        }
+
+        .sc-subcopy {
+          margin-top: 16px;
+          font-size: 14px;
+          line-height: 1.4;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          color: rgba(207, 93, 83, 0.82);
+        }
+
+        .sc-section-stack {
+          margin-top: -36px;
+        }
+
+        .sc-card-stack {
+          display: grid;
+          gap: 12px;
+          opacity: 0;
+          transform: translateY(18px);
+          transition: opacity 0.9s var(--ease) 0.28s, transform 0.9s var(--ease) 0.28s;
+        }
+
+        .sc-card-stack.on {
+          opacity: 1;
+          transform: translateY(0);
+        }
+
+        .sc-feature-card,
+        .sc-category-row,
+        .sc-about,
+        .sc-product-card {
+          background: linear-gradient(180deg, rgba(20, 8, 9, 0.72), rgba(12, 5, 6, 0.78));
+          border: 1px solid var(--line);
+          box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
+          backdrop-filter: blur(6px);
+        }
+
+        .sc-feature-card {
+          width: 100%;
+          display: flex;
+          align-items: stretch;
+          overflow: hidden;
+          min-height: 118px;
+          text-align: left;
+        }
+
+        .sc-feature-main {
+          flex: 1;
+          display: flex;
+          align-items: center;
+          gap: 14px;
+          padding: 16px 18px;
+        }
+
+        .sc-feature-icon,
+        .sc-category-icon {
+          width: 34px;
+          height: 34px;
+          color: rgba(205, 79, 71, 0.9);
+          flex: 0 0 auto;
+        }
+
+        .sc-feature-icon svg,
+        .sc-category-icon svg {
+          width: 100%;
+          height: 100%;
+        }
+
+        .sc-feature-title,
+        .sc-category-title {
+          margin: 0;
+          font-family: 'Barlow Condensed', sans-serif;
+          font-size: clamp(26px, 3.2vw, 38px);
+          font-weight: 700;
+          line-height: 1;
+          letter-spacing: 0.04em;
+          text-transform: uppercase;
+        }
+
+        .sc-feature-sub {
+          margin-top: 8px;
+          font-size: 13px;
+          line-height: 1.2;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          color: rgba(202, 94, 86, 0.78);
+        }
+
+        .sc-feature-arrow {
+          width: 26px;
+          height: 26px;
+          margin-left: auto;
+          border: 1px solid rgba(201, 58, 53, 0.3);
+          border-radius: 999px;
+          display: grid;
+          place-items: center;
+          color: rgba(202, 94, 86, 0.84);
+          font-size: 12px;
+        }
+
+        .sc-feature-thumb {
+          width: min(34vw, 220px);
+          position: relative;
           overflow: hidden;
         }
-        .hero-img-wrap {
-          position: absolute; inset: 0;
-          display: flex; justify-content: flex-end;
-        }
-        .hero-img {
-          height: 100%; width: 62%;
-          object-fit: cover; object-position: center 10%;
-          filter: brightness(0.9) saturate(1.15);
-          mask-image: linear-gradient(to left, black 50%, transparent 100%);
-          -webkit-mask-image: linear-gradient(to left, black 50%, transparent 100%);
-        }
-        .hero-ambient {
-          position: absolute; inset: 0; pointer-events: none;
-          background:
-            radial-gradient(ellipse 55% 65% at 72% 35%, rgba(192,57,43,0.2) 0%, transparent 65%),
-            linear-gradient(to right, rgba(0,0,0,0.98) 0%, rgba(0,0,0,0.4) 55%, rgba(0,0,0,0) 100%);
-        }
-        .hero-scanline {
-          position: absolute; inset: 0; pointer-events: none; z-index: 2;
-          background: repeating-linear-gradient(0deg, transparent 0px, transparent 3px, rgba(0,0,0,0.03) 3px, rgba(0,0,0,0.03) 4px);
-        }
-        .hero-bg-title {
-          position: absolute; right: -20px; top: 50%;
-          transform: translateY(-52%);
-          font-family: 'Cormorant Garamond', serif;
-          font-size: clamp(160px, 28vw, 340px);
-          font-weight: 700; line-height: 0.85;
-          color: transparent;
-          -webkit-text-stroke: 1px rgba(192,57,43,0.08);
-          text-transform: uppercase; pointer-events: none;
-          user-select: none; letter-spacing: -0.04em;
-        }
-        .hero-content {
-          position: relative; z-index: 10;
-          padding: 0 52px 80px;
-          max-width: 560px;
-          opacity: 0; transform: translateY(28px);
-          transition: opacity 1.1s var(--ease) 0.25s, transform 1.1s var(--ease) 0.25s;
-          font-family: 'DM Sans', sans-serif;
-        }
-        .hero-content.on { opacity: 1; transform: translateY(0); }
-        .hero-label {
-          font-size: 10px; letter-spacing: 0.5em; text-transform: uppercase;
-          color: var(--red); font-weight: 500; margin-bottom: 18px;
-          display: flex; align-items: center; gap: 12px;
-        }
-        .hero-label::before { content: ''; display: block; width: 32px; height: 1px; background: var(--red); }
-        .hero-h1 {
-          font-family: 'Cormorant Garamond', serif;
-          font-size: clamp(56px, 8vw, 100px);
-          font-weight: 700; line-height: 0.9;
-          letter-spacing: -0.025em; margin-bottom: 26px;
-        }
-        .hero-h1 em { font-style: italic; color: var(--red); }
-        .hero-sub {
-          font-size: 13px; color: rgba(255,255,255,0.42);
-          line-height: 1.8; max-width: 380px; margin-bottom: 40px; font-weight: 300;
-        }
-        .hero-btns { display: flex; gap: 14px; align-items: center; }
-        .btn-p {
-          background: var(--red); color: #fff; border: none;
-          padding: 14px 34px; font-size: 11px; font-weight: 500;
-          letter-spacing: 0.2em; text-transform: uppercase;
-          cursor: pointer; border-radius: 2px;
-          font-family: 'DM Sans', sans-serif;
-          transition: background 0.2s, box-shadow 0.25s;
-        }
-        .btn-p:hover { background: #a93226; box-shadow: 0 0 30px var(--red-glow); }
-        .btn-o {
-          background: none; border: 1px solid rgba(255,255,255,0.14);
-          color: rgba(255,255,255,0.55); padding: 14px 34px;
-          font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
-          cursor: pointer; border-radius: 2px;
-          font-family: 'DM Sans', sans-serif;
-          transition: border-color 0.2s, color 0.2s;
-        }
-        .btn-o:hover { border-color: rgba(255,255,255,0.38); color: #fff; }
 
-        /* Floating stats */
-        .hero-stats {
-          position: absolute; right: 52px; bottom: 80px; z-index: 10;
-          display: flex; flex-direction: column; gap: 10px;
-          opacity: 0; transform: translateX(20px);
-          transition: opacity 1s var(--ease) 0.55s, transform 1s var(--ease) 0.55s;
-        }
-        .hero-stats.on { opacity: 1; transform: translateX(0); }
-        .stat-card {
-          background: rgba(255,255,255,0.035);
-          border: 1px solid rgba(255,255,255,0.06);
-          backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
-          border-radius: 6px; padding: 14px 20px; min-width: 155px;
-        }
-        .stat-val {
-          font-family: 'Cormorant Garamond', serif;
-          font-size: 26px; font-weight: 600; color: #fff; line-height: 1;
-        }
-        .stat-val span { color: var(--red); }
-        .stat-label {
-          font-family: 'DM Sans', sans-serif;
-          font-size: 10px; color: rgba(255,255,255,0.3);
-          letter-spacing: 0.15em; text-transform: uppercase; margin-top: 5px;
+        .sc-feature-thumb img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          object-position: center 12%;
+          filter: brightness(0.82) contrast(1.04);
         }
 
-        /* COLLECTION */
-        .collection { padding: 100px 52px; position: relative; }
-        .collection::before {
-          content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
-          background: linear-gradient(to right, transparent, rgba(192,57,43,0.35), transparent);
-        }
-        .section-header {
-          display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 52px;
-        }
-        .section-label {
-          font-family: 'DM Sans', sans-serif;
-          font-size: 10px; letter-spacing: 0.4em; text-transform: uppercase;
-          color: var(--red); margin-bottom: 10px;
-        }
-        .section-title {
-          font-family: 'Cormorant Garamond', serif;
-          font-size: clamp(36px, 4vw, 54px); font-weight: 600; line-height: 1.02;
-        }
-        .section-desc {
-          font-family: 'DM Sans', sans-serif;
-          font-size: 13px; color: rgba(255,255,255,0.35);
-          max-width: 320px; line-height: 1.75; text-align: right; font-weight: 300;
-        }
-        .cards-grid {
-          display: grid; grid-template-columns: repeat(3,1fr); gap: 1px;
-          background: rgba(255,255,255,0.05);
-          border: 1px solid rgba(255,255,255,0.05); border-radius: 4px; overflow: hidden;
-        }
-        .mask-card {
-          background: #050505; padding: 40px 36px;
-          position: relative; cursor: pointer; overflow: hidden;
-          transition: background 0.3s;
-        }
-        .mask-card::after {
-          content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
-          background: var(--red); transform: scaleX(0); transform-origin: left;
-          transition: transform 0.35s var(--ease);
-        }
-        .mask-card:hover, .mask-card.active { background: #0a0a0a; }
-        .mask-card:hover::after, .mask-card.active::after { transform: scaleX(1); }
-        .card-id {
-          font-family: 'DM Sans', sans-serif; font-size: 10px;
-          color: rgba(255,255,255,0.18); letter-spacing: 0.3em; display: block; margin-bottom: 36px;
-        }
-        .card-tag {
-          font-family: 'DM Sans', sans-serif; font-size: 9px;
-          letter-spacing: 0.25em; text-transform: uppercase; color: var(--red);
-          margin-bottom: 8px; display: block;
-        }
-        .card-name {
-          font-family: 'Cormorant Garamond', serif;
-          font-size: 28px; font-weight: 600; margin-bottom: 12px; line-height: 1;
-        }
-        .card-desc {
-          font-family: 'DM Sans', sans-serif;
-          font-size: 13px; color: rgba(255,255,255,0.32); line-height: 1.75; font-weight: 300;
-        }
-        .card-arrow {
-          position: absolute; bottom: 36px; right: 36px;
-          font-size: 18px; color: rgba(255,255,255,0.1);
-          transition: color 0.2s, transform 0.2s;
-        }
-        .mask-card:hover .card-arrow { color: var(--red); transform: translate(3px,-3px); }
-
-        /* FEATURES */
-        .features {
-          display: grid; grid-template-columns: repeat(4,1fr); gap: 1px;
-          background: rgba(255,255,255,0.05);
-          border-top: 1px solid rgba(255,255,255,0.05);
-          border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-        .feat { background: #000; padding: 44px 32px; }
-        .feat-icon {
-          width: 36px; height: 36px; margin-bottom: 20px;
-          display: flex; align-items: center; justify-content: center;
-          border: 1px solid rgba(192,57,43,0.28); border-radius: 4px;
-          color: var(--red); font-size: 15px;
-        }
-        .feat-title {
-          font-family: 'Cormorant Garamond', serif;
-          font-size: 20px; font-weight: 600; margin-bottom: 10px;
-        }
-        .feat-desc {
-          font-family: 'DM Sans', sans-serif;
-          font-size: 12px; color: rgba(255,255,255,0.32); line-height: 1.85; font-weight: 300;
+        .sc-about {
+          padding: 18px 18px 20px;
+          margin-top: 12px;
         }
 
-        /* FOOTER */
-        .footer {
-          padding: 44px 52px;
-          display: flex; justify-content: space-between; align-items: center;
-          border-top: 1px solid rgba(255,255,255,0.05);
-          font-family: 'DM Sans', sans-serif;
+        .sc-about-title {
+          margin: 0 0 8px;
+          font-family: 'Barlow Condensed', sans-serif;
+          font-size: clamp(24px, 3vw, 42px);
+          line-height: 1;
+          font-weight: 700;
         }
-        .footer-logo {
-          font-family: 'Cormorant Garamond', serif;
-          font-size: 16px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase;
+
+        .sc-about-body {
+          margin: 0;
+          max-width: 940px;
+          font-size: clamp(13px, 1.45vw, 16px);
+          line-height: 1.5;
+          color: var(--text-dim);
         }
-        .footer-logo span { color: var(--red); }
-        .footer-text { font-size: 10px; color: rgba(255,255,255,0.18); letter-spacing: 0.2em; text-transform: uppercase; }
+
+        .sc-category-list {
+          display: grid;
+          gap: 10px;
+          margin-top: 14px;
+        }
+
+        .sc-category-row {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          width: 100%;
+          min-height: 94px;
+          padding: 0 16px;
+          text-align: left;
+        }
+
+        .sc-products {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 12px;
+          margin-top: 18px;
+        }
+
+        .sc-product-card {
+          overflow: hidden;
+        }
+
+        .sc-product-image {
+          aspect-ratio: 1 / 1.08;
+          background: rgba(255,255,255,0.02);
+        }
+
+        .sc-product-image img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          filter: brightness(0.82) contrast(1.04);
+        }
+
+        .sc-product-body {
+          padding: 10px 10px 14px;
+        }
+
+        .sc-product-name {
+          margin: 0;
+          font-family: 'Barlow Condensed', sans-serif;
+          font-size: clamp(18px, 2.4vw, 30px);
+          font-weight: 600;
+          line-height: 1.02;
+          text-transform: uppercase;
+        }
+
+        .sc-product-price {
+          margin-top: 6px;
+          color: #ffc18b;
+          font-family: 'Barlow Condensed', sans-serif;
+          font-size: clamp(22px, 3vw, 34px);
+          font-weight: 700;
+          text-transform: uppercase;
+        }
+
+        .sc-pill {
+          display: inline-flex;
+          align-items: center;
+          min-height: 28px;
+          padding: 0 10px;
+          margin-top: 8px;
+          border-radius: 999px;
+          background: rgba(56, 120, 47, 0.72);
+          color: #d9ffcf;
+          font-size: 12px;
+          font-weight: 600;
+        }
+
+        .sc-product-note {
+          margin-top: 8px;
+          color: rgba(232, 115, 107, 0.84);
+          font-size: clamp(12px, 1.5vw, 15px);
+          line-height: 1.25;
+        }
+
+        .sc-button {
+          cursor: pointer;
+          transition: border-color 0.24s ease, background 0.24s ease, transform 0.24s ease;
+        }
+
+        .sc-button:hover {
+          border-color: var(--line-strong);
+          background: linear-gradient(180deg, rgba(28, 8, 10, 0.78), rgba(16, 4, 5, 0.88));
+          transform: translateY(-1px);
+        }
 
         .sc-loader {
-          position: fixed; inset: 0; background: #000; z-index: 1000;
-          display: flex; align-items: center; justify-content: center;
-        }
-        .sc-loader p {
-          font-family: 'DM Sans', sans-serif;
-          font-size: 10px; letter-spacing: 0.5em; color: #fff; text-transform: uppercase;
+          position: fixed;
+          inset: 0;
+          z-index: 10;
+          display: grid;
+          place-items: center;
+          background: rgba(0,0,0,0.66);
+          backdrop-filter: blur(4px);
         }
 
-        @media (max-width: 900px) {
-          .nav { padding: 18px 24px; }
-          .hero-content { padding: 0 24px 60px; max-width: 100%; }
-          .hero-img { width: 100%; }
-          .hero-stats { right: 24px; bottom: 60px; }
-          .cards-grid { grid-template-columns: 1fr; }
-          .features { grid-template-columns: 1fr 1fr; }
-          .collection { padding: 72px 24px; }
-          .footer { padding: 36px 24px; flex-direction: column; gap: 12px; text-align: center; }
+        .sc-loader p {
+          margin: 0;
+          font-family: 'Barlow Condensed', sans-serif;
+          font-size: 16px;
+          letter-spacing: 0.28em;
+          text-transform: uppercase;
+        }
+
+        @keyframes smokeDrift {
+          0% { transform: translate3d(-4%, -1%, 0) scale(1); }
+          50% { transform: translate3d(2%, 2%, 0) scale(1.06); }
+          100% { transform: translate3d(-2%, 4%, 0) scale(0.98); }
+        }
+
+        @media (min-width: 900px) {
+          .sc-content {
+            padding: 26px 28px 46px;
+          }
+
+          .sc-hero {
+            min-height: 640px;
+            padding-top: 56px;
+          }
+
+          .sc-copy {
+            width: 420px;
+          }
+
+          .sc-section-stack {
+            margin-top: -90px;
+            width: min(100%, 720px);
+          }
+
+          .sc-products {
+            gap: 16px;
+          }
+
+          .sc-feature-thumb {
+            width: 220px;
+          }
+        }
+
+        @media (max-width: 640px) {
+          .sc-content {
+            padding: 16px 12px 24px;
+          }
+
+          .sc-hero {
+            min-height: 430px;
+          }
+
+          .sc-copy {
+            width: 240px;
+          }
+
+          .sc-title {
+            font-size: 64px;
+          }
+
+          .sc-feature-card {
+            min-height: 106px;
+          }
+
+          .sc-feature-main {
+            padding: 12px 14px;
+            gap: 12px;
+          }
+
+          .sc-feature-thumb {
+            width: 120px;
+          }
+
+          .sc-category-row {
+            min-height: 86px;
+          }
+
+          .sc-product-body {
+            padding: 10px 8px 12px;
+          }
         }
       `}</style>
 
-      {/* NAV */}
-      <nav className={`nav ${loaded ? "on" : ""}`}>
-        <div className="nav-logo">SAVE <span>CHANGES</span></div>
-        <div className="nav-links">
-          <button className="nav-link" onClick={() => window.scrollTo({ top: window.innerHeight, behavior: "smooth" })}></button>
-          <button className="nav-link"></button>
-          <button className="nav-link"></button>
-          <button className="nav-cta" onClick={handleEnter}>Enter Shop</button>
-        </div>
-      </nav>
-
-      {/* HERO */}
-      <section className="hero">
-        <div className="hero-img-wrap">
-          <img className="hero-img" src="/oni.jpg" alt="Oni mask specimen" />
-        </div>
-        <div className="hero-ambient" />
-        <div className="hero-scanline" />
-        <div className="hero-bg-title">ONI</div>
-
-        <div className={`hero-content ${loaded ? "on" : ""}`}>
-          <p className="hero-label">SS / 2026 Edition</p>
-          <h1 className="hero-h1">ALTER<br />YOUR<br /><em>EGO.</em></h1>
-          <p className="hero-sub">Hand-crafted masks forged at the intersection of ancient ritual and machine precision. Each piece a complete identity shift.</p>
-          <div className="hero-btns">
-            <button className="btn-p" onClick={handleEnter}>View Catalog</button>
-            <button className="btn-o">Our Story</button>
-          </div>
-        </div>
-
-        <div className={`hero-stats ${loaded ? "on" : ""}`}>
-          <div className="stat-card">
-            <div className="stat-val">6<span>+</span></div>
-            <div className="stat-label">Active Series</div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-val"><span>∞</span></div>
-            <div className="stat-label">Identities</div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-val">01<span>/</span>26</div>
-            <div className="stat-label">Current Drop</div>
-          </div>
-        </div>
-      </section>
-
-      {/* COLLECTION */}
-      <section className="collection">
-        <div className="section-header">
-          <div>
-            <p className="section-label">Current Collection</p>
-            <h2 className="section-title">The Mask<br />Archetypes</h2>
-          </div>
-          <p className="section-desc">Three distinct lineages. Each carries its own material language, mythology, and intent.</p>
-        </div>
-        <div className="cards-grid">
-          {MASKS.map((mask, i) => (
-            <div key={mask.id} className={`mask-card ${activeMask === i ? "active" : ""}`} onMouseEnter={() => setActiveMask(i)}>
-              <span className="card-id">{mask.id}</span>
-              <span className="card-tag">{mask.tag}</span>
-              <h3 className="card-name">{mask.name}</h3>
-              <p className="card-desc">{mask.desc}</p>
-              <span className="card-arrow">↗</span>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* FEATURES */}
-      <div className="features">
-        {[
-          { icon: "⬡", title: "Hand-formed", desc: "Each mask is individually cast and finished by craftspeople trained in traditional Japanese lacquer techniques." },
-          { icon: "◈", title: "Limited drops", desc: "No piece is mass produced. Every series is capped. Once gone, the mold is destroyed." },
-          { icon: "◉", title: "Identity system", desc: "Masks are numbered to their wearer. Your mask exists once. There is no duplicate." },
-          { icon: "⌬", title: "Material archive", desc: "Full provenance documentation ships with every piece — material origin, forge date, artisan mark." },
-        ].map(f => (
-          <div className="feat" key={f.title}>
-            <div className="feat-icon">{f.icon}</div>
-            <h4 className="feat-title">{f.title}</h4>
-            <p className="feat-desc">{f.desc}</p>
+      <div className="sc-bg-wrap">
+        {HERO_BACKGROUNDS.map((src, index) => (
+          <div key={src} className={`sc-bg ${index === activeBackground ? "on" : ""}`}>
+            <img src={src} alt="Savechanges background" />
           </div>
         ))}
+        <div className="sc-bg-overlay" />
+        <div className="sc-smoke" />
+        <div className="sc-grid" />
+        <div className="sc-noise" />
       </div>
 
-      <footer className="footer">
-        <div className="footer-logo">SAVE <span>CHANGES</span></div>
-        <p className="footer-text">© 2026 Save Changes Clothing — All identities reserved</p>
-      </footer>
+      <div className="sc-content">
+        <header className={`sc-topbar ${loaded ? "on" : ""}`}>
+          <div className="sc-brand">Savechanges</div>
+          <button type="button" className="sc-cart sc-button" onClick={() => navigate("/shop")} aria-label="Cart">
+            <CartIcon />
+          </button>
+        </header>
 
-      {transitioning && (
-        <div className="sc-loader"><p>Initializing Shop...</p></div>
-      )}
+        <section className="sc-hero">
+          <div className={`sc-copy ${loaded ? "on" : ""}`}>
+            <h1 className="sc-title">
+              ALTER
+              <br />
+              YOUR
+              <br />
+              EGO.
+            </h1>
+            <p className="sc-subcopy">Choose your new identity</p>
+          </div>
+        </section>
+
+        <section className="sc-section-stack">
+          <div className={`sc-card-stack ${loaded ? "on" : ""}`}>
+            {FEATURE_CARDS.map((card) => (
+              <button key={card.title} type="button" className="sc-feature-card sc-button" onClick={() => navigate(card.path)}>
+                <div className="sc-feature-main">
+                  <div className="sc-feature-icon">{card.icon}</div>
+                  <div>
+                    <h2 className="sc-feature-title">{card.title}</h2>
+                    <div className="sc-feature-sub">{card.subtitle}</div>
+                  </div>
+                  <div className="sc-feature-arrow">&gt;</div>
+                </div>
+                <div className="sc-feature-thumb">
+                  <img src={card.image} alt={card.title} />
+                </div>
+              </button>
+            ))}
+          </div>
+
+          <section className="sc-about">
+            <h2 className="sc-about-title">Where Artistry Meets Alter Ego</h2>
+            <p className="sc-about-body">
+              We specialize in bringing creatures, and whimsical characters to life through handcrafted masks and bespoke costume pieces. Produced in controlled batches, we work as a tribute to the art of the character. By blending traditional clay craft with modern digital design and meticulous hand painting, we ensure every piece meets an exacting standard of quality. Because we prioritize craftsmanship over mass production, each item is given the time and attention it deserves to become something truly unique. Step into a new identity. Embrace the extraordinary.
+            </p>
+          </section>
+
+          <div className="sc-category-list">
+            {CATEGORY_ROWS.map((row) => (
+              <button key={row.title} type="button" className="sc-category-row sc-button" onClick={() => navigate(row.path)}>
+                <div className="sc-category-icon">{row.icon}</div>
+                <h3 className="sc-category-title">{row.title}</h3>
+              </button>
+            ))}
+          </div>
+
+          <section className="sc-products">
+            {PRODUCT_CARDS.map((product) => (
+              <article key={product.name} className="sc-product-card">
+                <div className="sc-product-image">
+                  <img src={product.image} alt={product.name} style={{ objectPosition: product.position }} />
+                </div>
+                <div className="sc-product-body">
+                  <h3 className="sc-product-name">{product.name}</h3>
+                  <div className="sc-product-price">{product.price}</div>
+                  <div className="sc-pill">FREE delivery</div>
+                  <div className="sc-product-note">{product.note}</div>
+                </div>
+              </article>
+            ))}
+          </section>
+        </section>
+      </div>
+
+      {transitioning ? (
+        <div className="sc-loader">
+          <p>Loading</p>
+        </div>
+      ) : null}
     </main>
   );
 }
