@@ -1170,6 +1170,201 @@ export default function Home() {
           color: var(--text-dim);
           text-align: right;
         }
+
+        /* ── DESKTOP NAV LINKS (hidden mobile) ── */
+        .sc-nav-links { display: none; }
+
+        /* ═══════════════════════════════════════════
+           DESKTOP  ≥ 720px
+           ═══════════════════════════════════════════ */
+        @media (min-width: 720px) {
+
+          /* global */
+          .sc-home { max-width: 100%; }
+
+          /* ── NAV ── */
+          .sc-nav-top {
+            padding: 0 56px;
+            height: 64px;
+            max-width: 1440px;
+            margin: 0 auto;
+            width: 100%;
+            box-sizing: border-box;
+          }
+
+          .sc-logo { font-size: 24px; }
+
+          .sc-nav-bottom { display: none; }
+
+          .sc-nav-links {
+            display: flex !important;
+            align-items: center;
+            gap: 36px;
+            flex: 1;
+            justify-content: center;
+          }
+
+          .sc-nav-link {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.28em;
+            text-transform: uppercase;
+            color: rgba(220,210,205,0.5);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            transition: color 0.15s;
+          }
+          .sc-nav-link:hover { color: var(--text); }
+
+          /* ── HERO ── */
+          .sc-hero { height: 90vh; min-height: 640px; }
+
+          .sc-hero-content {
+            padding: 0 80px 60px;
+            max-width: 700px;
+          }
+
+          .sc-hero-title { font-size: clamp(100px, 11vw, 180px); }
+          .sc-hero-sub   { font-size: 17px; letter-spacing: 0.22em; }
+          .sc-hero-cta   { font-size: 14px; padding: 12px 28px; letter-spacing: 0.28em; }
+
+          /* ── PRODUCTS ── */
+          .sc-products-label {
+            padding: 40px 64px 14px;
+            font-size: 12px;
+            max-width: 1440px;
+            margin: 0 auto;
+            width: 100%;
+            box-sizing: border-box;
+          }
+
+          .sc-scroll-hint { display: none; }
+
+          .sc-products-scroll {
+            display: grid !important;
+            grid-template-columns: repeat(6, 1fr);
+            overflow-x: visible;
+            padding: 0 64px;
+            max-width: 1440px;
+            margin: 0 auto;
+            gap: 1px;
+          }
+
+          .sc-product-card { flex: none; width: auto; scroll-snap-align: none; }
+          .sc-product-img-wrap { aspect-ratio: 3 / 4; }
+
+          /* ── NIGHT MARKET ── */
+          .sc-banner { height: 420px; }
+
+          .sc-banner-content {
+            padding: 40px 80px;
+            max-width: 900px;
+          }
+
+          .sc-banner-title { font-size: 76px; }
+
+          /* ── ARCHIVES ── */
+          .sc-archives { height: 360px; }
+
+          .sc-archives-content {
+            padding: 44px 80px;
+            max-width: 860px;
+          }
+
+          .sc-archives-title { font-size: 62px; }
+
+          /* ── ABOUT ── */
+          .sc-about {
+            padding: 60px 80px;
+            display: grid;
+            grid-template-columns: 3fr 2fr;
+            grid-template-rows: auto auto auto;
+            column-gap: 64px;
+            max-width: 1440px;
+            margin: 0 auto;
+            box-sizing: border-box;
+          }
+
+          .sc-about-skull {
+            position: static;
+            grid-column: 2;
+            grid-row: 1;
+            display: flex;
+            justify-content: flex-end;
+            font-size: 0;
+          }
+
+          .sc-about-title {
+            grid-column: 1;
+            grid-row: 1;
+            font-size: 26px;
+            max-width: 100%;
+            margin-bottom: 18px;
+            align-self: center;
+          }
+
+          .sc-about-body {
+            grid-column: 1;
+            grid-row: 2;
+            font-size: 14px;
+            line-height: 1.8;
+          }
+
+          .sc-about-tagline {
+            grid-column: 2;
+            grid-row: 2;
+            font-size: 15px;
+            line-height: 1.65;
+            border-left: 1px solid rgba(200,30,10,0.2);
+            padding-left: 32px;
+            color: var(--text-soft);
+          }
+
+          .sc-learn-more {
+            grid-column: 1;
+            grid-row: 3;
+            margin-top: 24px;
+          }
+
+          /* ── CATEGORY BANNERS ── */
+          .sc-cat-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+          }
+
+          .sc-category-banner {
+            height: 260px;
+            margin: 0;
+            border-top: none;
+            border-bottom: 1px solid var(--red-border-dim);
+            border-right: 1px solid var(--red-border-dim);
+            border-left: none;
+          }
+
+          .sc-category-banner:nth-child(2n) {
+            border-right: none;
+          }
+
+          /* last item full-width if odd count */
+          .sc-category-banner:last-child:nth-child(odd) {
+            grid-column: span 2;
+          }
+
+          .sc-category-name { font-size: 54px; }
+
+          .sc-category-icon img { width: 54px; height: 54px; }
+
+          /* ── FOOTER ── */
+          .sc-footer {
+            padding: 28px 80px;
+            max-width: 1440px;
+            margin: 0 auto;
+            box-sizing: border-box;
+          }
+        }
       `}</style>
 
       {/* NAVBAR */}
@@ -1177,6 +1372,11 @@ export default function Home() {
         <div className="sc-nav-top">
           <div className="sc-logo">
             SAVECHANGES <span className="sc-logo-fx">FX</span>
+          </div>
+          <div className="sc-nav-links">
+            <button className="sc-nav-link" onClick={() => navigate("/")}>HOME</button>
+            <button className="sc-nav-link" onClick={navigateNightMarket}>NIGHT MARKET</button>
+            <button className="sc-nav-link" onClick={navigateArchive}>ENTER ARCHIVES</button>
           </div>
           <div className="sc-nav-icons">
             <button className="sc-icon-btn" aria-label="Search">
@@ -1430,6 +1630,7 @@ export default function Home() {
 
       {/* CATEGORY BANNERS */}
       <section className={`sc-section ${mounted ? "on" : ""}`}>
+        <div className="sc-cat-grid">
         {CATEGORY_BANNERS.map((cat) => (
           <div
             key={cat.name}
@@ -1450,6 +1651,7 @@ export default function Home() {
             </div>
           </div>
         ))}
+        </div>
       </section>
 
       {/* FOOTER */}
