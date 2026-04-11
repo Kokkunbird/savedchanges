@@ -12,12 +12,12 @@ const PHOTO_SLOTS = {
   arsenal:      { preferred: "/categories/category-arsenal.jpg",      fallback: "/oni.jpg",    position: "left center" },
   accessories:  { preferred: "/categories/category-accessories.jpg",  fallback: "/story2.jpg", position: "left center" },
   apparel:      { preferred: "/categories/category-apparel.jpg",      fallback: "/story4.jpg", position: "left center" },
-  productOne:   { preferred: "/products/product-mecha-maul.png",      fallback: "/story4.jpg", position: "center top" },
-  productTwo:   { preferred: "/products/product-samson-robot.png",    fallback: "/story4.jpg", position: "center top" },
-  productThree: { preferred: "/products/product-samson-shaman.png",   fallback: "/story1.jpg", position: "center top" },
-  productFour:  { preferred: "/products/product-oni-crimson.png",     fallback: "/story3.jpg", position: "center top" },
-  productFive:  { preferred: "/products/product-oni-nightvision.png", fallback: "/story3.jpg", position: "center top" },
-  productSix:   { preferred: "/products/product-smiling-man-2.png",   fallback: "/story2.jpg", position: "center top" },
+  productOne:   { preferred: "/products/IDENTITIES/product-mecha-maul.png",      fallback: "/story4.jpg", position: "center top" },
+  productTwo:   { preferred: "/products/IDENTITIES/product-samson-robot.png",    fallback: "/story4.jpg", position: "center top" },
+  productThree: { preferred: "/products/IDENTITIES/product-samson-shaman.png",   fallback: "/story1.jpg", position: "center top" },
+  productFour:  { preferred: "/products/IDENTITIES/product-oni-crimson.png",     fallback: "/story3.jpg", position: "center top" },
+  productFive:  { preferred: "/products/IDENTITIES/product-oni-nightvision.png", fallback: "/story3.jpg", position: "center top" },
+  productSix:   { preferred: "/products/IDENTITIES/product-smiling-man-2.png",   fallback: "/story2.jpg", position: "center top" },
 };
 
 const PRODUCT_CARDS = [
