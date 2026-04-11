@@ -1,0 +1,41 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cp \"AI ENHANCED RAIN.PNG\"   sections/hero-identity-main.jpg)",
+      "Bash(cp \"IMG_0772.JPG\"            sections/night-market-banner.jpg)",
+      "Bash(cp \"IMG_0776.JPG\"            sections/feature-archive-card.jpg)",
+      "Bash(cp \"story1.jpg\"              categories/category-identities.jpg)",
+      "Bash(cp \"story3.jpg\"              categories/category-armory.jpg)",
+      "Bash(cp \"oni.jpg\"                 categories/category-arsenal.jpg)",
+      "Bash(cp \"IMG_0867.PNG\"            categories/category-accessories.jpg)",
+      "Bash(cp \"AI ENHANCED 3\\(1\\).JPG\"   categories/category-apparel.jpg)",
+      "Bash(cp \"IMG_0314.JPG\"            products/product-mask-01.jpg)",
+      "Bash(cp \"story4.jpg\"              products/product-mask-02.jpg)",
+      "Bash(cp \"story1.jpg\"              products/product-mask-03.jpg)",
+      "Bash(cp \"story3.jpg\"              products/product-mask-04.jpg)",
+      "Bash(cp \"AI ENHANCED RAIN.PNG\"   products/product-mask-05.jpg)",
+      "Bash(cp \"IMG_0685.JPG\"  archive/archive-robot-squad.jpg)",
+      "Bash(cp \"IMG_0691.JPG\"  archive/archive-fusedcorp.jpg)",
+      "Bash(cp \"IMG_0663.JPG\"  archive/archive-costume-child.jpg)",
+      "Bash(cp \"IMG_0659.JPG\"  archive/archive-clown-street.jpg)",
+      "Bash(cp \"IMG_0770.JPG\"  atmosphere/atmosphere-fire-day.jpg)",
+      "Bash(cp \"X. 0CF910E1-DDDE-4BC8-9A66-7AFC22139335.PNG\"  archive/archive-jeff-killer.jpg)",
+      "Bash(cp \"9F572F49-D563-4A52-B5C3-53BE5AD3FD60.PNG\"      archive/archive-jeff-sighting.jpg)",
+      "Bash(cp \"FB25524A-F62C-46DB-B62F-A42EDE30A5C7.PNG\"      archive/archive-barker-family.jpg)",
+      "Bash(cp \"AI ENHANCED 3\\(1\\).JPG\"                           archive/archive-crimson-oni.jpg)",
+      "Bash(mkdir -p \"d:/savedchanges-main/public/archive-backgrounds\")",
+      "Bash(cp \"atmosphere/atmosphere-fire-house.jpg\"   archive-backgrounds/bg-1.jpg)",
+      "Bash(cp \"sections/feature-archive-card.jpg\"      archive-backgrounds/bg-2.jpg)",
+      "Bash(cp \"archive/archive-fusedcorp.jpg\"          archive-backgrounds/bg-3.jpg)",
+      "Bash(cp \"archive/archive-clown-street.jpg\"       archive-backgrounds/bg-4.jpg)",
+      "Bash(mv \"Screenshot 2026-04-09 at 10.46.41 PM.png\" \"product-jeffrey-woods.png\")",
+      "Bash(mv \"Screenshot 2026-04-09 at 10.46.45 PM.png\" \"product-clown.png\")",
+      "Bash(mv \"Screenshot 2026-04-09 at 4.41.50 AM.png\" \"product-mecha-maul.png\")",
+      "Bash(mv \"Screenshot 2026-04-09 at 4.41.59 AM.png\" \"product-samson-robot.png\")",
+      "Bash(mv \"Screenshot 2026-04-09 at 4.42.10 AM.png\" \"product-samson-flesh.png\")",
+      "Bash(git add:*)",
+      "Bash(git commit -m ':*)",
+      "Bash(git push:*)"
+    ]
+  }
+}
