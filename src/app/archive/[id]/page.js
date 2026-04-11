@@ -30,7 +30,7 @@ export default function SubjectDossierPage() {
   if (!subject) return <div style={{color: 'red'}}>404: FILE_CORRUPTED</div>;
 
   return (
-    <main style={{
+    <main className="dossier-main" style={{
       background: "#000",
       color: "#00ffff", // Technical cyan for labels
       maxWidth: "480px",
@@ -51,18 +51,43 @@ export default function SubjectDossierPage() {
           100% { transform: translate(0); }
         }
         .glitch-active { animation: textGlitch 0.2s linear infinite; color: #fff !important; }
-        
+
         .label-red { color: #cc2200; font-weight: 900; font-size: 11px; letter-spacing: 1px; margin-bottom: 4px; display: block; }
         .data-cyan { color: #00ffff; font-size: 10px; line-height: 1.2; }
         .data-white { color: #fff; font-size: 10px; }
         .border-red { border: 1px solid rgba(204, 34, 0, 0.4); }
         .divider { height: 1px; background: rgba(204, 34, 0, 0.3); margin: 6px 0; }
-        
+
         /* Scanline effect overlay */
         .scanlines::before {
           content: " "; display: block; position: absolute; top: 0; left: 0; bottom: 0; right: 0;
           background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
           z-index: 10; background-size: 100% 2px, 3px 100%; pointer-events: none;
+        }
+
+        /* Gallery scroll — hide scrollbar, keep function */
+        .gallery-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+        .gallery-scroll::-webkit-scrollbar { display: none; }
+
+        /* ── DESKTOP ── */
+        @media (min-width: 720px) {
+          .dossier-main {
+            max-width: 900px !important;
+            padding: 20px 36px !important;
+          }
+          .dossier-top-grid {
+            grid-template-columns: 1.8fr 1fr !important;
+            gap: 20px !important;
+            min-height: 340px;
+          }
+          .dossier-top-grid > div:first-child {
+            min-height: 340px !important;
+          }
+          .label-red { font-size: 13px !important; letter-spacing: 2px !important; }
+          .data-cyan { font-size: 11px !important; line-height: 1.5 !important; }
+          .data-white { font-size: 11px !important; }
+          .dossier-stats { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 16px !important; }
+          .dossier-threat { font-size: 56px !important; }
         }
       `}</style>
 
@@ -82,7 +107,7 @@ export default function SubjectDossierPage() {
       </div>
 
       {/* ── TOP TIER: TWO COLUMN GRID ── */}
-      <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: "10px", marginBottom: "10px" }}>
+      <div className="dossier-top-grid" style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: "10px", marginBottom: "10px" }}>
         {/* Left: Main Sighting Photo */}
         <div style={{ border: "1px solid #333", position: "relative", minHeight: "220px" }}>
           <img
@@ -125,13 +150,11 @@ export default function SubjectDossierPage() {
         <div style={{fontSize: '9px', color: '#444', marginBottom: '8px'}}>{subject.caseRef}</div>
 
         <span className="label-red">PHYSICAL STATS</span>
-        <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+        <div className="dossier-stats" style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
           {[
             ["HEIGHT", subject.bio.height],
             ["WEIGHT", subject.bio.weight],
-            ["AGE", `42 (DECEASED)`],
             ["BUILD", subject.bio.build],
-            ["HAIR", "DARK BLONDE"],
             ["EYES", subject.bio.eyes]
           ].map(([label, val]) => (
             <div key={label} style={{ display: "flex", borderBottom: "1px solid #1a1a1a" }}>
@@ -146,7 +169,7 @@ export default function SubjectDossierPage() {
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
         <div>
            <span className="label-red">THREAT LEVEL :</span>
-           <div style={{ fontSize: "40px", color: "#cc2200", fontWeight: "900", lineHeight: "1" }}>
+           <div className="dossier-threat" style={{ fontSize: "40px", color: "#cc2200", fontWeight: "900", lineHeight: "1" }}>
               {subject.threatLevel}
            </div>
            <div style={{fontSize: '8px', color: '#cc2200'}}>{subject.threat}</div>
@@ -160,17 +183,21 @@ export default function SubjectDossierPage() {
       </div>
 
       {/* ── BOTTOM GALLERY ── */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "4px", marginTop: "10px" }}>
+      <div
+        className="gallery-scroll"
+        style={{ display: "flex", overflowX: "auto", gap: "4px", marginTop: "10px", scrollSnapType: "x mandatory" }}
+      >
         {[subject.photo, subject.sightingPhoto, subject.secondaryPhoto, ...(subject.extraPhotos || [])].filter(Boolean).map((src, i) => (
-          <img
-            key={i}
-            src={src}
-            alt={`photo-${i}`}
-            onClick={() => setLightbox(src)}
-            style={{ width: "100%", aspectRatio: "1", objectFit: "cover", border: "1px solid #333", cursor: "pointer", transition: "opacity 0.15s" }}
-            onMouseEnter={e => e.currentTarget.style.opacity = "0.75"}
-            onMouseLeave={e => e.currentTarget.style.opacity = "1"}
-          />
+          <div key={i} style={{ flex: "0 0 calc(33.333% - 3px)", scrollSnapAlign: "start" }}>
+            <img
+              src={src}
+              alt={`photo-${i}`}
+              onClick={() => setLightbox(src)}
+              style={{ width: "100%", aspectRatio: "1", objectFit: "cover", border: "1px solid #333", cursor: "pointer", display: "block", transition: "opacity 0.15s" }}
+              onMouseEnter={e => e.currentTarget.style.opacity = "0.75"}
+              onMouseLeave={e => e.currentTarget.style.opacity = "1"}
+            />
+          </div>
         ))}
       </div>
 
