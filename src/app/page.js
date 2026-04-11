@@ -295,30 +295,47 @@ export default function Home() {
           width: 78vw;
           max-width: 300px;
           background: #0a0608;
-          border-right: 1px solid rgba(200,30,10,0.25);
           z-index: 100;
           display: flex;
           flex-direction: column;
           transform: translateX(-100%);
           transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
-          overflow-y: auto;
+          overflow: hidden;
         }
         .sc-menu-panel.open {
           transform: translateX(0);
+        }
+
+        /* Background image with dark overlay */
+        .sc-menu-bg {
+          position: absolute;
+          inset: 0;
+          background-image: url('/sections/hero-identity-main.jpg');
+          background-size: cover;
+          background-position: center top;
+          filter: brightness(0.22) saturate(0.5);
+          z-index: 0;
+        }
+        .sc-menu-inner {
+          position: relative;
+          z-index: 1;
+          display: flex;
+          flex-direction: column;
+          height: 100%;
+          overflow-y: auto;
         }
 
         .sc-menu-header {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 14px 16px;
-          border-bottom: 1px solid rgba(200,30,10,0.18);
-          background: rgba(200,30,10,0.06);
+          padding: 14px 16px 12px;
+          border-bottom: 1px solid rgba(200,30,10,0.22);
         }
 
         .sc-menu-logo {
           font-family: 'Barlow Condensed', sans-serif;
-          font-size: 18px;
+          font-size: 17px;
           font-weight: 900;
           letter-spacing: 0.06em;
           text-transform: uppercase;
@@ -326,13 +343,18 @@ export default function Home() {
         }
 
         .sc-menu-close {
-          background: none;
+          background: #cc2200;
           border: none;
           cursor: pointer;
-          color: rgba(209,213,219,0.5);
-          font-size: 18px;
+          color: #fff;
+          font-size: 13px;
+          font-weight: 900;
+          width: 26px;
+          height: 26px;
+          display: grid;
+          place-items: center;
           line-height: 1;
-          padding: 4px;
+          padding: 0;
         }
 
         .sc-menu-section-label {
@@ -349,8 +371,8 @@ export default function Home() {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 12px 16px;
-          border-bottom: 1px solid rgba(255,255,255,0.04);
+          padding: 13px 16px;
+          border-bottom: 1px dashed rgba(255,255,255,0.08);
           cursor: pointer;
           background: none;
           border-left: none;
@@ -362,14 +384,14 @@ export default function Home() {
           gap: 10px;
         }
         .sc-menu-item:hover {
-          background: rgba(200,30,10,0.06);
+          background: rgba(200,30,10,0.1);
         }
 
         .sc-menu-item-text {
           font-family: 'Barlow Condensed', sans-serif;
-          font-size: 18px;
+          font-size: 19px;
           font-weight: 900;
-          letter-spacing: 0.06em;
+          letter-spacing: 0.04em;
           text-transform: uppercase;
           color: #fff;
           line-height: 1;
@@ -385,8 +407,8 @@ export default function Home() {
         }
 
         .sc-menu-item-arrow {
-          font-size: 11px;
-          color: rgba(200,30,10,0.5);
+          font-size: 14px;
+          color: rgba(255,255,255,0.5);
           flex-shrink: 0;
         }
 
@@ -1401,71 +1423,63 @@ export default function Home() {
       {/* ── SIDE PANEL ── */}
       <div className={`sc-menu-backdrop${menuOpen ? " open" : ""}`} onClick={() => setMenuOpen(false)} />
       <div className={`sc-menu-panel${menuOpen ? " open" : ""}`}>
-        {/* Header */}
-        <div className="sc-menu-header">
-          <span className="sc-menu-logo">SAVECHANGES <span style={{ fontSize: 11, fontWeight: 500, color: "rgba(209,213,219,0.45)", letterSpacing: "0.14em" }}>FX</span></span>
-          <button className="sc-menu-close" onClick={() => setMenuOpen(false)}>✕</button>
-        </div>
+        <div className="sc-menu-bg" />
+        <div className="sc-menu-inner">
 
-        {/* Main nav */}
-        <div className="sc-menu-section-label">NAVIGATE</div>
-
-        {[
-          { label: "HOME", sub: "Landing page", path: "/" },
-          { label: "NIGHT MARKET", sub: "Browse the collection", path: "/shop/night-market" },
-          { label: "ENTER ARCHIVES", sub: "Blacksite subject files", path: "/archive", isArchive: true },
-        ].map(item => (
-          <button
-            key={item.label}
-            className="sc-menu-item"
-            onClick={() => {
-              setMenuOpen(false);
-              if (item.isArchive) {
-                navigateArchive();
-              } else {
-                navigate(item.path);
-              }
-            }}
-          >
-            <div>
-              <div className="sc-menu-item-text">{item.label}</div>
-              <div className="sc-menu-item-sub">{item.sub}</div>
-            </div>
-            <span className="sc-menu-item-arrow">→</span>
-          </button>
-        ))}
-
-        <div className="sc-menu-divider" />
-        <div className="sc-menu-section-label">SHOP BY CATEGORY</div>
-
-        {[
-          { label: "IDENTITIES", sub: "Masks & wearable identity", path: "/shop/identities", icon: "/icons/IDENTITY ICON 2.PNG"  },
-          { label: "ARMORY",     sub: "Tactical gear & hardware",  path: "/shop/armory",     icon: "/icons/ARMOURY ICON.PNG"     },
-          { label: "ARSENAL",    sub: "Weapons & accessories",     path: "/shop/arsenal",    icon: "/icons/WEAPONARY ICON.PNG"   },
-          { label: "ACCESSORIES",sub: "Wearables & extras",        path: "/shop/accessories",icon: "/icons/ACCESSORIES ICON.PNG" },
-          { label: "APPAREL",    sub: "Clothing & outerwear",      path: "/shop/apparel",    icon: "/icons/JACKET.PNG"           },
-        ].map(item => (
-          <button
-            key={item.label}
-            className="sc-menu-item"
-            onClick={() => { setMenuOpen(false); navigate(item.path); }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <img src={item.icon} alt={item.label} style={{ width: 36, height: 36, objectFit: "contain", flexShrink: 0, borderRadius: 3 }} />
-              <div>
-                <div className="sc-menu-item-text">{item.label}</div>
-                <div className="sc-menu-item-sub">{item.sub}</div>
-              </div>
-            </div>
-            <span className="sc-menu-item-arrow">→</span>
-          </button>
-        ))}
-
-        {/* Footer strip */}
-        <div style={{ marginTop: "auto", padding: "14px 16px", borderTop: "1px solid rgba(200,30,10,0.1)" }}>
-          <div style={{ fontSize: 6, letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(209,213,219,0.15)", fontFamily: "'Courier New', monospace" }}>
-            SAVECHANGES FX // ALL RIGHTS RESERVED
+          {/* Header */}
+          <div className="sc-menu-header">
+            <span className="sc-menu-logo">SAVECHANGES <span style={{ fontSize: 10, fontWeight: 500, color: "#e63320", letterSpacing: "0.14em" }}>FX</span></span>
+            <button className="sc-menu-close" onClick={() => setMenuOpen(false)}>✕</button>
           </div>
+
+          {/* Nav items — flat single list */}
+          {[
+            { label: "HOME",                    path: "/" },
+            { label: "NIGHT MARKET",            path: "/shop/night-market" },
+            { label: "MASKS (IDENTITY)",        path: "/shop/identities" },
+            { label: "JEWELRY (ACCESSORIES)",   path: "/shop/accessories" },
+            { label: "COSTUME PIECES (ARMOUR)", path: "/shop/armory" },
+            { label: "HALLOWEEN SPECIALS",      path: "/shop/identities" },
+            { label: "PROP WEAPONS (ARSENAL)",  path: "/shop/arsenal" },
+            { label: "ABOUT US",                path: "/about" },
+          ].map(item => (
+            <button
+              key={item.label}
+              className="sc-menu-item"
+              onClick={() => { setMenuOpen(false); navigate(item.path); }}
+            >
+              <span className="sc-menu-item-text">{item.label}</span>
+              <span className="sc-menu-item-arrow">→</span>
+            </button>
+          ))}
+
+          {/* Skull logo */}
+          <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "24px 0" }}>
+            <svg width="72" height="72" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" opacity="0.18">
+              <circle cx="50" cy="44" r="32" fill="white"/>
+              <rect x="33" y="68" width="11" height="15" rx="2" fill="white"/>
+              <rect x="56" y="68" width="11" height="15" rx="2" fill="white"/>
+              <circle cx="38" cy="41" r="8" fill="#0a0608"/>
+              <circle cx="62" cy="41" r="8" fill="#0a0608"/>
+              <path d="M43 58 Q50 53 57 58" stroke="#0a0608" strokeWidth="2.5" fill="none"/>
+            </svg>
+          </div>
+
+          {/* Footer: social + copyright */}
+          <div style={{ padding: "12px 16px", borderTop: "1px solid rgba(200,30,10,0.15)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <div style={{ display: "flex", gap: 14, alignItems: "center" }}>
+              <a href="https://tiktok.com/@savechanges.store" target="_blank" rel="noopener noreferrer" style={{ color: "rgba(209,213,219,0.4)", display: "flex" }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.73a8.22 8.22 0 004.84 1.56V6.84a4.85 4.85 0 01-1.07-.15z"/></svg>
+              </a>
+              <a href="https://instagram.com/savechanges.store" target="_blank" rel="noopener noreferrer" style={{ color: "rgba(209,213,219,0.4)", display: "flex" }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.5" fill="currentColor"/></svg>
+              </a>
+            </div>
+            <div style={{ fontSize: 5.5, letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(209,213,219,0.12)", fontFamily: "'Courier New', monospace" }}>
+              © SAVECHANGES FX
+            </div>
+          </div>
+
         </div>
       </div>
 

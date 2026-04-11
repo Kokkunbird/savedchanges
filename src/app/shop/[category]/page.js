@@ -281,206 +281,133 @@ function ProductModal({ product, isStripe, onClose, onAddToCart }) {
 }
 
 // ─── CART DRAWER ──────────────────────────────────────────────────────────────
-function CartDrawer({ cart, open, onClose, onCheckout }) {
-  const total = cart.reduce((sum, item) => sum + (item.amount || 0) * item.qty, 0);
+function CartDrawer({ cart, open, onClose, onCheckout, onRemove, onUpdateQty, slug }) {
+  const [shippingProtection, setShippingProtection] = useState(true);
+  const SHIPPING_FEE = 300; // $3.00 in cents
+  const subtotal = cart.reduce((sum, item) => sum + (item.amount || 0) * item.qty, 0);
+  const total = subtotal + (shippingProtection ? SHIPPING_FEE : 0);
+
+  // "You may also like" — up to 2 products not already in cart
+  const cartIds = new Set(cart.map(i => i.id));
+  const recs = (STATIC_PRODUCTS.identities || []).filter(p => !cartIds.has(p.id)).slice(0, 2);
+
+  const F = "'Barlow Condensed', sans-serif";
+  const MONO = "'Courier New', monospace";
 
   return (
     <>
-      {open && (
-        <div
-          onClick={onClose}
-          style={{
-            position: "fixed",
-            inset: 0,
-            zIndex: 149,
-            background: "rgba(0,0,0,0.7)",
-          }}
-        />
-      )}
-      <aside
-        style={{
-          position: "fixed",
-          right: 0,
-          top: 0,
-          bottom: 0,
-          zIndex: 150,
-          width: "min(100%, 360px)",
-          background: "#0d0608",
-          borderLeft: "1px solid rgba(200,30,10,0.3)",
-          display: "flex",
-          flexDirection: "column",
-          transform: open ? "translateX(0)" : "translateX(100%)",
-          transition: "transform 0.3s cubic-bezier(0.22,1,0.36,1)",
-        }}
-      >
-        {/* Header */}
-        <div style={{
-          padding: "16px 16px",
-          borderBottom: "1px solid rgba(200,30,10,0.2)",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}>
-          <div>
-            <div style={{
-              fontFamily: "'Barlow Condensed', sans-serif",
-              fontSize: 9,
-              letterSpacing: "0.3em",
-              textTransform: "uppercase",
-              color: "rgba(200,190,185,0.45)",
-              marginBottom: 2,
-            }}>
-              YOUR CART
+      {open && <div onClick={onClose} style={{ position: "fixed", inset: 0, zIndex: 149, background: "rgba(0,0,0,0.72)" }} />}
+      <aside style={{
+        position: "fixed", right: 0, top: 0, bottom: 0, zIndex: 150,
+        width: "min(100vw, 360px)", background: "#0a0608",
+        borderLeft: "1px solid rgba(200,30,10,0.25)",
+        display: "flex", flexDirection: "column",
+        transform: open ? "translateX(0)" : "translateX(100%)",
+        transition: "transform 0.3s cubic-bezier(0.22,1,0.36,1)",
+      }}>
+
+        {/* ── HEADER ── */}
+        <div style={{ padding: "13px 14px", borderBottom: "1px solid rgba(200,30,10,0.18)", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
+          <span style={{ fontFamily: F, fontSize: 17, fontWeight: 900, letterSpacing: "0.05em", color: "#fff", textTransform: "uppercase" }}>
+            SΛ<span style={{ color: "#e63320" }}>VE</span>CHANGES
+          </span>
+          <button onClick={onClose} style={{ background: "#cc2200", border: "none", color: "#fff", width: 28, height: 28, cursor: "pointer", fontSize: 13, fontWeight: 900, display: "grid", placeItems: "center" }}>✕</button>
+        </div>
+
+        {/* ── YOU HAVE X ITEMS ── */}
+        <div style={{ padding: "10px 14px 8px", borderBottom: "1px solid rgba(200,30,10,0.12)", flexShrink: 0 }}>
+          <div style={{ fontFamily: MONO, fontSize: 8, letterSpacing: "0.3em", textTransform: "uppercase", color: "#e63320", fontWeight: 900 }}>
+            YOU HAVE {cart.length} ITEM{cart.length !== 1 ? "S" : ""} IN YOUR CART
+          </div>
+        </div>
+
+        {/* ── SCROLLABLE BODY ── */}
+        <div style={{ flex: 1, overflowY: "auto" }}>
+
+          {/* Cart items */}
+          <div style={{ padding: "10px 14px" }}>
+            {cart.length === 0 ? (
+              <div style={{ border: "1px dashed rgba(200,30,10,0.2)", padding: "28px 16px", textAlign: "center", marginTop: 8 }}>
+                <div style={{ fontFamily: F, fontSize: 11, letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(200,190,185,0.3)" }}>CART IS EMPTY</div>
+              </div>
+            ) : (
+              cart.map((item) => (
+                <div key={item.id} style={{ display: "flex", gap: 10, alignItems: "flex-start", borderBottom: "1px solid rgba(200,30,10,0.12)", paddingBottom: 12, marginBottom: 12 }}>
+                  {/* Image */}
+                  <img src={item.image || "/story1.jpg"} alt={item.name} onError={(e) => { e.target.src = "/story1.jpg"; }}
+                    style={{ width: 60, height: 60, objectFit: "cover", flexShrink: 0 }} />
+                  {/* Info + qty */}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontFamily: F, fontSize: 12, fontWeight: 700, letterSpacing: "0.04em", textTransform: "uppercase", color: "#e8e0dc", lineHeight: 1.2 }}>
+                      {item.name}
+                    </div>
+                    <div style={{ fontFamily: F, fontSize: 10, color: "rgba(200,190,185,0.45)", letterSpacing: "0.1em", marginTop: 1 }}>
+                      {item.sub || "MASK"}
+                    </div>
+                    {/* Qty controls */}
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 7 }}>
+                      <button onClick={() => onUpdateQty(item.id, item.qty - 1)} style={{ width: 22, height: 22, background: "rgba(200,30,10,0.15)", border: "1px solid rgba(200,30,10,0.35)", color: "#e8e0dc", cursor: "pointer", fontSize: 14, display: "grid", placeItems: "center" }}>−</button>
+                      <span style={{ fontFamily: MONO, fontSize: 10, color: "#e8e0dc", minWidth: 14, textAlign: "center" }}>{item.qty}</span>
+                      <button onClick={() => onUpdateQty(item.id, item.qty + 1)} style={{ width: 22, height: 22, background: "rgba(200,30,10,0.15)", border: "1px solid rgba(200,30,10,0.35)", color: "#e8e0dc", cursor: "pointer", fontSize: 14, display: "grid", placeItems: "center" }}>+</button>
+                    </div>
+                  </div>
+                  {/* Price + remove */}
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8, flexShrink: 0 }}>
+                    <div style={{ fontFamily: F, fontSize: 13, fontWeight: 700, color: "#e63320" }}>{item.price || formatStripePrice(item)}</div>
+                    <button onClick={() => onRemove(item.id)} style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(200,30,10,0.5)", fontSize: 14, padding: 0, lineHeight: 1 }} title="Remove">🗑</button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+
+          {/* ── YOU MAY ALSO LIKE ── */}
+          {recs.length > 0 && (
+            <div style={{ padding: "10px 14px 14px", borderTop: "1px solid rgba(200,30,10,0.12)" }}>
+              <div style={{ fontFamily: MONO, fontSize: 7, letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(200,30,10,0.6)", marginBottom: 10, fontWeight: 900 }}>YOU MAY ALSO LIKE</div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                {recs.map(p => (
+                  <div key={p.id} style={{ border: "1px solid rgba(200,30,10,0.25)", background: "#0d0608", overflow: "hidden" }}>
+                    <img src={p.image || "/story1.jpg"} alt={p.name} onError={(e) => { e.target.src = "/story1.jpg"; }}
+                      style={{ width: "100%", aspectRatio: "1", objectFit: "cover", display: "block" }} />
+                    <div style={{ padding: "6px 7px 8px" }}>
+                      <div style={{ fontFamily: F, fontSize: 9, fontWeight: 700, color: "#e8e0dc", textTransform: "uppercase", letterSpacing: "0.04em", lineHeight: 1.2 }}>{p.name}</div>
+                      <div style={{ fontFamily: F, fontSize: 11, fontWeight: 700, color: "#e63320", marginTop: 3 }}>{p.price}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
-            <div style={{
-              fontFamily: "'Barlow Condensed', sans-serif",
-              fontSize: 13,
-              fontWeight: 700,
-              letterSpacing: "0.15em",
-              textTransform: "uppercase",
-              color: "#e8e0dc",
-            }}>
-              {cart.length} ITEM{cart.length !== 1 ? "S" : ""}
+          )}
+
+          {/* ── SHIPPING PROTECTION ── */}
+          <div style={{ padding: "10px 14px 14px", borderTop: "1px solid rgba(200,30,10,0.12)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontFamily: F, fontSize: 11, fontWeight: 700, color: "#e8e0dc", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                  Shipping protection <span style={{ color: "#e63320" }}>$3.00</span>
+                </div>
+                <div style={{ fontFamily: MONO, fontSize: 7, color: "rgba(200,190,185,0.4)", marginTop: 3, letterSpacing: "0.05em", lineHeight: 1.5 }}>
+                  Your order is protected from loss, theft, or damage
+                </div>
+              </div>
+              {/* Toggle */}
+              <div onClick={() => setShippingProtection(p => !p)} style={{ width: 38, height: 20, borderRadius: 10, background: shippingProtection ? "#22c55e" : "rgba(200,30,10,0.3)", cursor: "pointer", position: "relative", transition: "background 0.2s", flexShrink: 0 }}>
+                <div style={{ position: "absolute", top: 2, left: shippingProtection ? 20 : 2, width: 16, height: 16, borderRadius: "50%", background: "#fff", transition: "left 0.2s" }} />
+              </div>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            style={{
-              background: "none",
-              border: "1px solid rgba(200,30,10,0.3)",
-              color: "rgba(200,190,185,0.6)",
-              fontFamily: "'Barlow Condensed', sans-serif",
-              fontSize: 11,
-              letterSpacing: "0.2em",
-              textTransform: "uppercase",
-              padding: "6px 12px",
-              cursor: "pointer",
-            }}
-          >
-            CLOSE
-          </button>
         </div>
 
-        {/* Items */}
-        <div style={{ flex: 1, overflowY: "auto", padding: "12px 16px" }}>
-          {cart.length === 0 ? (
-            <div style={{
-              border: "1px dashed rgba(200,30,10,0.2)",
-              padding: "32px 16px",
-              textAlign: "center",
-              marginTop: 16,
-            }}>
-              <div style={{
-                fontFamily: "'Barlow Condensed', sans-serif",
-                fontSize: 11,
-                letterSpacing: "0.3em",
-                textTransform: "uppercase",
-                color: "rgba(200,190,185,0.3)",
-              }}>
-                CART IS EMPTY
-              </div>
-            </div>
-          ) : (
-            cart.map((item) => (
-              <div
-                key={item.id}
-                style={{
-                  borderBottom: "1px solid rgba(200,30,10,0.15)",
-                  paddingBottom: 12,
-                  marginBottom: 12,
-                  display: "flex",
-                  gap: 10,
-                  alignItems: "flex-start",
-                }}
-              >
-                <img
-                  src={item.image || "/story1.jpg"}
-                  alt={item.name}
-                  onError={(e) => { e.target.src = "/story1.jpg"; }}
-                  style={{ width: 52, height: 52, objectFit: "cover", flexShrink: 0 }}
-                />
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{
-                    fontFamily: "'Barlow Condensed', sans-serif",
-                    fontSize: 13,
-                    fontWeight: 700,
-                    letterSpacing: "0.04em",
-                    textTransform: "uppercase",
-                    color: "#e8e0dc",
-                    lineHeight: 1.2,
-                  }}>
-                    {item.name}
-                  </div>
-                  <div style={{
-                    fontFamily: "'Barlow Condensed', sans-serif",
-                    fontSize: 11,
-                    color: "rgba(200,190,185,0.5)",
-                    marginTop: 2,
-                    letterSpacing: "0.1em",
-                  }}>
-                    QTY {item.qty}
-                  </div>
-                </div>
-                <div style={{
-                  fontFamily: "'Barlow Condensed', sans-serif",
-                  fontSize: 14,
-                  fontWeight: 700,
-                  color: "#e63320",
-                  flexShrink: 0,
-                }}>
-                  {item.price || formatStripePrice(item)}
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-
-        {/* Footer */}
+        {/* ── CHECK OUT BUTTON ── */}
         {cart.length > 0 && (
-          <div style={{ padding: "16px", borderTop: "1px solid rgba(200,30,10,0.2)" }}>
-            <div style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: 14,
-            }}>
-              <span style={{
-                fontFamily: "'Barlow Condensed', sans-serif",
-                fontSize: 10,
-                letterSpacing: "0.25em",
-                textTransform: "uppercase",
-                color: "rgba(200,190,185,0.45)",
-              }}>
-                TOTAL
-              </span>
-              <span style={{
-                fontFamily: "'Barlow Condensed', sans-serif",
-                fontSize: 20,
-                fontWeight: 700,
-                color: "#e8e0dc",
-              }}>
-                USD {(total / 100).toFixed(0)}
-              </span>
-            </div>
-            <button
-              onClick={onCheckout}
-              style={{
-                width: "100%",
-                background: "#cc2200",
-                border: "none",
-                color: "#fff",
-                fontFamily: "'Barlow Condensed', sans-serif",
-                fontSize: 12,
-                fontWeight: 700,
-                letterSpacing: "0.3em",
-                textTransform: "uppercase",
-                padding: "14px 0",
-                cursor: "pointer",
-              }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = "#e63320"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = "#cc2200"; }}
+          <div style={{ flexShrink: 0, borderTop: "1px solid rgba(200,30,10,0.2)" }}>
+            <button onClick={onCheckout} style={{ width: "100%", background: "#111", border: "none", color: "#e8e0dc", fontFamily: F, fontSize: 14, fontWeight: 900, letterSpacing: "0.2em", textTransform: "uppercase", padding: "16px 0", cursor: "pointer", display: "flex", justifyContent: "center", alignItems: "center", gap: 12 }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = "#1a1a1a"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = "#111"; }}
             >
-              CHECKOUT
+              CHECK OUT
+              <span style={{ color: "#e63320" }}>${(total / 100).toFixed(0)}</span>
             </button>
           </div>
         )}
@@ -537,6 +464,15 @@ export default function CategoryPage() {
     setSelected(null);
     setCartOpen(true);
   }, []);
+
+  const removeFromCart = useCallback((id) => {
+    setCart((prev) => prev.filter((i) => i.id !== id));
+  }, []);
+
+  const updateQty = useCallback((id, qty) => {
+    if (qty < 1) { removeFromCart(id); return; }
+    setCart((prev) => prev.map((i) => i.id === id ? { ...i, qty } : i));
+  }, [removeFromCart]);
 
   const handleCheckout = useCallback(async () => {
     const stripeItems = cart.filter((i) => i.priceId);
@@ -845,6 +781,9 @@ export default function CategoryPage() {
         open={cartOpen}
         onClose={() => setCartOpen(false)}
         onCheckout={handleCheckout}
+        onRemove={removeFromCart}
+        onUpdateQty={updateQty}
+        slug={slug}
       />
     </>
   );
