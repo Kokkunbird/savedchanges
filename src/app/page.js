@@ -1480,7 +1480,7 @@ export default function Home() {
             <span>EGO.</span>
           </h1>
           <div className="sc-hero-sub">CHOOSE YOUR<br />NEW IDENTITY</div>
-          <button className="sc-hero-cta" onClick={() => navigate("/shop")}>
+          <button className="sc-hero-cta" onClick={navigateNightMarket}>
             SHOP NOW
           </button>
         </div>
@@ -1668,19 +1668,19 @@ export default function Home() {
           </svg>
         </button>
         {/* TikTok */}
-        <button className="sc-footer-icon" aria-label="TikTok">
+        <a className="sc-footer-icon" href="https://tiktok.com/@savechanges.store" target="_blank" rel="noopener noreferrer" aria-label="TikTok">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
             <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.73a8.22 8.22 0 004.84 1.56V6.84a4.85 4.85 0 01-1.07-.15z"/>
           </svg>
-        </button>
+        </a>
         {/* Instagram */}
-        <button className="sc-footer-icon" aria-label="Instagram">
+        <a className="sc-footer-icon" href="https://instagram.com/savechanges.store" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
             <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
             <circle cx="12" cy="12" r="4"/>
             <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor"/>
           </svg>
-        </button>
+        </a>
       </footer>
 
       {transitioning && (
