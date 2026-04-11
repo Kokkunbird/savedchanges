@@ -143,50 +143,49 @@ export default function SubjectDossierPage() {
           </div>
         </div>
 
-        {/* ── DOSSIER BODY ── */}
+        {/* ══ TOP PHOTOS ROW ══ */}
+        <div style={{ display: "flex", borderBottom: "1px solid rgba(200,30,10,0.18)" }}>
+          {/* Left: sighting photo */}
+          {subject.sightingPhoto ? (
+            <div style={{ flex: 1, borderRight: subject.photo ? "1px solid rgba(200,30,10,0.18)" : "none", display: "flex", flexDirection: "column" }}>
+              {subject.sightingLabel && (
+                <div style={{ padding: "4px 7px 2px" }}>
+                  <span style={{ fontSize: 6.5, fontStyle: "italic", color: "rgba(209,213,219,0.35)", letterSpacing: "0.04em", fontFamily: "'Barlow', sans-serif" }}>{subject.sightingLabel}</span>
+                </div>
+              )}
+              <img className="click-photo" src={subject.sightingPhoto} alt="sighting"
+                style={{ flex: 1, objectFit: "cover", filter: "contrast(1.08) saturate(0.7)" }}
+                onClick={() => setLightbox(subject.sightingPhoto)} />
+            </div>
+          ) : !subject.photo ? (
+            <div style={{ flex: 1, height: 140, background: "#0d0a0b", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <span style={{ fontSize: 8, color: "rgba(200,30,10,0.18)", letterSpacing: "0.3em", textTransform: "uppercase" }}>NO VISUAL</span>
+            </div>
+          ) : null}
+
+          {/* Right: main portrait photo */}
+          {subject.photo && (
+            <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+              {subject.photoLabel && (
+                <div style={{ padding: "4px 7px 2px" }}>
+                  <span style={{ fontSize: 6.5, fontStyle: "italic", color: "rgba(209,213,219,0.35)", letterSpacing: "0.04em", fontFamily: "'Barlow', sans-serif" }}>{subject.photoLabel}</span>
+                </div>
+              )}
+              <img className="click-photo" src={subject.photo} alt={subject.alias}
+                style={{ flex: 1, objectFit: "cover", filter: "contrast(1.08) saturate(0.72)" }}
+                onClick={() => setLightbox(subject.photo)} />
+            </div>
+          )}
+        </div>
+
+        {/* ══ MAIN BODY: two columns of text ══ */}
         <div style={{ display: "flex", borderBottom: "1px solid rgba(200,30,10,0.18)" }}>
 
-          {/* ══ LEFT COLUMN (43%) ══ */}
+          {/* LEFT COLUMN (43%) */}
           <div style={{ width: "43%", flexShrink: 0, borderRight: "1px solid rgba(200,30,10,0.18)", display: "flex", flexDirection: "column" }}>
 
-            {/* Sighting label + photo */}
-            {subject.sightingPhoto && (
-              <>
-                <div style={{ padding: "5px 7px 3px" }}>
-                  <span style={{ fontSize: 6.5, fontStyle: "italic", color: "rgba(209,213,219,0.38)", letterSpacing: "0.04em", fontFamily: "'Barlow', sans-serif" }}>
-                    {subject.sightingLabel}
-                  </span>
-                </div>
-                <img
-                  className="click-photo"
-                  src={subject.sightingPhoto}
-                  alt="sighting"
-                  style={{ filter: "contrast(1.08) saturate(0.7)" }}
-                  onClick={() => setLightbox(subject.sightingPhoto)}
-                />
-              </>
-            )}
-
-            {/* Main subject photo (shown here if NO sighting photo) */}
-            {!subject.sightingPhoto && subject.photo && (
-              <img
-                className="click-photo"
-                src={subject.photo}
-                alt={subject.alias}
-                style={{ filter: "contrast(1.08) saturate(0.72)" }}
-                onClick={() => setLightbox(subject.photo)}
-              />
-            )}
-
-            {/* No photo fallback */}
-            {!subject.sightingPhoto && !subject.photo && (
-              <div style={{ height: 140, background: "#0d0a0b", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <span style={{ fontSize: 8, color: "rgba(200,30,10,0.18)", letterSpacing: "0.3em", textTransform: "uppercase" }}>NO VISUAL</span>
-              </div>
-            )}
-
             {/* Classification */}
-            <div style={{ padding: "7px 7px 5px", borderTop: "1px solid rgba(200,30,10,0.14)" }}>
+            <div style={{ padding: "7px 7px 5px", borderBottom: "1px solid rgba(200,30,10,0.14)" }}>
               <span className="sl">SUBJECT CLASSIFICATION</span>
               <div style={{ fontSize: 7, color: "rgba(209,213,219,0.45)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>{subject.type}</div>
               <div style={{ fontSize: 7, color: "rgba(209,213,219,0.6)", textTransform: "uppercase", letterSpacing: "0.04em", lineHeight: 1.4, marginBottom: 4 }}>{subject.classification}</div>
@@ -195,7 +194,7 @@ export default function SubjectDossierPage() {
             </div>
 
             {/* Biological profile */}
-            <div style={{ padding: "6px 7px", borderTop: "1px solid rgba(200,30,10,0.14)" }}>
+            <div style={{ padding: "6px 7px" }}>
               <span className="sl">BIOLOGICAL PROFILE</span>
               {[["HEIGHT", subject.bio.height], ["WEIGHT", subject.bio.weight], ["BUILD", subject.bio.build], ["EYES", subject.bio.eyes]].map(([l, v]) => (
                 <div key={l} style={{ display: "flex", gap: 4, marginBottom: 3 }}>
@@ -204,56 +203,22 @@ export default function SubjectDossierPage() {
                 </div>
               ))}
             </div>
-
-            {/* Secondary subject photo — if sighting photo was shown above, put portrait here */}
-            {subject.sightingPhoto && subject.photo && (
-              <div style={{ borderTop: "1px solid rgba(200,30,10,0.14)", marginTop: "auto" }}>
-                <img
-                  className="click-photo"
-                  src={subject.photo}
-                  alt={subject.name}
-                  style={{ filter: "contrast(1.1) saturate(0.65)" }}
-                  onClick={() => setLightbox(subject.photo)}
-                />
-              </div>
-            )}
           </div>
 
-          {/* ══ RIGHT COLUMN ══ */}
+          {/* RIGHT COLUMN */}
           <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
 
-            {/* Panel (criminal record / achievements / etc.) */}
+            {/* Panel */}
             <div style={{ padding: "7px 8px", borderBottom: "1px solid rgba(200,30,10,0.14)" }}>
               <span className="sl">{subject.panel.title}</span>
               <div style={{ fontSize: 6.5, color: sc, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 5 }}>STATUS: {subject.panelStatus}</div>
               {subject.panel.entries.map(e => <div key={e} className="ent">{e}</div>)}
             </div>
 
-            {/* Secondary / police dept photo */}
-            {subject.secondaryPhoto && (
-              <div style={{ borderBottom: "1px solid rgba(200,30,10,0.14)" }}>
-                {subject.secondaryPhotoLabel && (
-                  <div style={{ padding: "4px 8px 2px", fontSize: 6.5, letterSpacing: "0.16em", textTransform: "uppercase", color: "rgba(209,213,219,0.3)" }}>{subject.secondaryPhotoLabel}</div>
-                )}
-                <img
-                  className="click-photo"
-                  src={subject.secondaryPhoto}
-                  alt="secondary"
-                  style={{ filter: "contrast(1.08) saturate(0.65)" }}
-                  onClick={() => setLightbox(subject.secondaryPhoto)}
-                />
-              </div>
-            )}
-
             {/* Threat level */}
             <div style={{ padding: "7px 8px", borderBottom: "1px solid rgba(200,30,10,0.14)" }}>
               <span className="sl">THREAT LEVEL :</span>
-              <div style={{
-                fontSize: 44, fontWeight: 900,
-                fontFamily: "'Barlow Condensed', sans-serif",
-                color: "#e63320", lineHeight: 1, letterSpacing: "0.04em",
-                textShadow: "0 0 18px rgba(230,51,32,0.4)",
-              }}>{subject.threatLevel}</div>
+              <div style={{ fontSize: 44, fontWeight: 900, fontFamily: "'Barlow Condensed', sans-serif", color: "#e63320", lineHeight: 1, letterSpacing: "0.04em", textShadow: "0 0 18px rgba(230,51,32,0.4)" }}>{subject.threatLevel}</div>
             </div>
 
             {/* Condition notes */}
@@ -287,6 +252,24 @@ export default function SubjectDossierPage() {
             )}
           </div>
         </div>
+
+        {/* ══ BOTTOM PHOTOS ROW ══ */}
+        {(subject.secondaryPhoto || (subject.extraPhotos && subject.extraPhotos.length > 0)) && (
+          <div style={{ display: "flex", borderBottom: "1px solid rgba(200,30,10,0.18)" }}>
+            {[subject.secondaryPhoto, ...(subject.extraPhotos || [])].filter(Boolean).map((src, i, arr) => (
+              <div key={i} style={{ flex: 1, borderRight: i < arr.length - 1 ? "1px solid rgba(200,30,10,0.18)" : "none", display: "flex", flexDirection: "column" }}>
+                {subject.secondaryPhotoLabel && i === 0 && (
+                  <div style={{ padding: "4px 7px 2px" }}>
+                    <span style={{ fontSize: 6.5, fontStyle: "italic", color: "rgba(209,213,219,0.35)", letterSpacing: "0.04em", fontFamily: "'Barlow', sans-serif" }}>{subject.secondaryPhotoLabel}</span>
+                  </div>
+                )}
+                <img className="click-photo" src={src} alt={`photo-${i}`}
+                  style={{ objectFit: "cover", filter: "contrast(1.08) saturate(0.68)" }}
+                  onClick={() => setLightbox(src)} />
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* ── BARCODE STRIP ── */}
         <div style={{ background: "#050305", borderBottom: "1px solid rgba(200,30,10,0.1)", padding: "7px 11px", display: "flex", alignItems: "center", gap: 9 }}>
