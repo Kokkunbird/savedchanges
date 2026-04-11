@@ -11,303 +11,213 @@ const ORIGIN_FULL = {
   X: "X-ORIGIN // UNKNOWN DESIGNATION",
 };
 
-// ─── LIGHTBOX ─────────────────────────────────────────────────────────────────
-function Lightbox({ src, onClose }) {
-  useEffect(() => {
-    document.body.style.overflow = "hidden";
-    return () => { document.body.style.overflow = ""; };
-  }, []);
-  return (
-    <div onClick={onClose} style={{
-      position: "fixed", inset: 0, zIndex: 300,
-      background: "rgba(0,0,0,0.94)",
-      display: "flex", alignItems: "center", justifyContent: "center",
-      padding: 16,
-    }}>
-      <img src={src} alt="" onClick={e => e.stopPropagation()} style={{
-        maxWidth: "100%", maxHeight: "88vh", objectFit: "contain", display: "block",
-      }} />
-      <button onClick={onClose} style={{
-        position: "absolute", top: 14, right: 14,
-        background: "none", border: "1px solid rgba(200,30,10,0.5)",
-        color: "#e63320", fontSize: 9, letterSpacing: "0.3em",
-        textTransform: "uppercase", padding: "5px 12px", cursor: "pointer",
-        fontFamily: "'Courier New', monospace",
-      }}>✕ CLOSE</button>
-    </div>
-  );
-}
-
-// ─── MAIN ─────────────────────────────────────────────────────────────────────
 export default function SubjectDossierPage() {
   const router = useRouter();
   const params = useParams();
-  const [glitch, setGlitch] = useState(false);
+  const [glitchActive, setGlitchActive] = useState(false);
   const [lightbox, setLightbox] = useState(null);
-
   const subject = ALL_SUBJECTS.find(s => s.slug === params.id);
 
+  // Random glitch trigger
   useEffect(() => {
     const t = setInterval(() => {
-      setGlitch(true);
-      setTimeout(() => setGlitch(false), 130);
-    }, 6500);
+      setGlitchActive(true);
+      setTimeout(() => setGlitchActive(false), 200);
+    }, 4000);
     return () => clearInterval(t);
   }, []);
 
-  if (!subject) {
-    return (
-      <main style={{ minHeight: "100vh", background: "#0a0608", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", fontFamily: "'Courier New', monospace", gap: 14 }}>
-        <div style={{ fontSize: 8, letterSpacing: "0.4em", color: "rgba(200,30,10,0.5)", textTransform: "uppercase" }}>FILE NOT FOUND</div>
-        <button onClick={() => router.push("/archive")} style={{ background: "none", border: "1px solid rgba(200,30,10,0.4)", color: "#e63320", fontFamily: "'Barlow Condensed', sans-serif", fontSize: 10, fontWeight: 700, letterSpacing: "0.3em", textTransform: "uppercase", padding: "8px 22px", cursor: "pointer" }}>
-          ← BACK
-        </button>
-      </main>
-    );
-  }
-
-  const sc = statusColor(subject.status);
+  if (!subject) return <div style={{color: 'red'}}>404: FILE_CORRUPTED</div>;
 
   return (
-    <>
+    <main style={{
+      background: "#000",
+      color: "#00ffff", // Technical cyan for labels
+      maxWidth: "480px",
+      margin: "0 auto",
+      minHeight: "100vh",
+      fontFamily: "'Courier New', monospace",
+      padding: "10px",
+      textTransform: "uppercase",
+      position: "relative",
+      overflowX: "hidden"
+    }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Barlow:wght@400&display=swap');
-        * { box-sizing: border-box; }
-
-        @keyframes pg { 0%,100%{transform:none;filter:none} 15%{transform:translateX(-3px);filter:hue-rotate(25deg)} 30%{transform:translateX(3px)} 45%{transform:none} }
-        .pg { animation: pg 0.22s steps(1) forwards; }
-
-        .sl {
-          font-size: 6px;
-          font-weight: 900;
-          letter-spacing: 0.28em;
-          text-transform: uppercase;
-          color: #f59e0b;
-          margin-bottom: 4px;
-          display: block;
-          font-family: 'Courier New', monospace;
+        @keyframes textGlitch {
+          0% { transform: translate(0); text-shadow: none; }
+          20% { transform: translate(-2px, 1px); text-shadow: 2px 0 #f00, -2px 0 #0ff; }
+          40% { transform: translate(2px, -1px); }
+          60% { transform: translate(-1px, 0); }
+          100% { transform: translate(0); }
         }
-
-        .ent {
-          font-size: 6.5px;
-          color: rgba(209,213,219,0.72);
-          letter-spacing: 0.04em;
-          text-transform: uppercase;
-          margin-bottom: 3px;
-          padding-left: 6px;
-          border-left: 1px solid rgba(200,30,10,0.28);
-          line-height: 1.45;
-          font-family: 'Courier New', monospace;
-        }
-
-        .br { height: 1px; background: rgba(200,30,10,0.14); margin: 5px 0; }
-
-        .click-photo {
-          display: block;
-          width: 100%;
-          cursor: pointer;
-          transition: filter 0.15s ease;
-        }
-        .click-photo:hover { filter: brightness(1.15) !important; }
-
-        .para-text {
-          font-size: 6.5px;
-          color: rgba(209,213,219,0.68);
-          line-height: 1.7;
-          text-transform: uppercase;
-          letter-spacing: 0.03em;
-          margin: 0;
-          font-family: 'Courier New', monospace;
+        .glitch-active { animation: textGlitch 0.2s linear infinite; color: #fff !important; }
+        
+        .label-red { color: #cc2200; font-weight: 900; font-size: 11px; letter-spacing: 1px; margin-bottom: 4px; display: block; }
+        .data-cyan { color: #00ffff; font-size: 10px; line-height: 1.2; }
+        .data-white { color: #fff; font-size: 10px; }
+        .border-red { border: 1px solid rgba(204, 34, 0, 0.4); }
+        .divider { height: 1px; background: rgba(204, 34, 0, 0.3); margin: 6px 0; }
+        
+        /* Scanline effect overlay */
+        .scanlines::before {
+          content: " "; display: block; position: absolute; top: 0; left: 0; bottom: 0; right: 0;
+          background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+          z-index: 10; background-size: 100% 2px, 3px 100%; pointer-events: none;
         }
       `}</style>
 
-      {lightbox && <Lightbox src={lightbox} onClose={() => setLightbox(null)} />}
+      <div className="scanlines" />
 
-      <main className={glitch ? "pg" : ""} style={{
-        minHeight: "100vh",
-        background: "#0a0608",
-        maxWidth: 480,
-        margin: "0 auto",
-        fontFamily: "'Courier New', Courier, monospace",
-        color: "#d1d5db",
-        position: "relative",
-      }}>
-        {/* Scanlines */}
-        <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 50, backgroundImage: "linear-gradient(rgba(0,0,0,0) 50%, rgba(0,0,0,0.05) 50%)", backgroundSize: "100% 3px" }} />
+      {/* ── TOP HEADER ── */}
+      <div style={{ borderBottom: "2px solid #cc2200", paddingBottom: "4px", marginBottom: "8px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <span className={`label-red ${glitchActive ? 'glitch-active' : ''}`} style={{fontSize: '14px'}}>
+            STATUS : CLASSIFIED [||||||]
+          </span>
+          <span style={{color: '#fff', fontSize: '18px'}}>🔍 🛒</span>
+        </div>
+        <div style={{ color: "#00ffff", fontSize: "9px", letterSpacing: "1px" }}>
+          {ORIGIN_FULL[subject.origin]}
+        </div>
+      </div>
 
-        {/* ── HEADER ── */}
-        <div style={{ position: "sticky", top: 0, zIndex: 40, background: "rgba(8,4,5,0.98)", backdropFilter: "blur(8px)" }}>
-          {/* Status bar */}
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "6px 11px", background: "rgba(200,30,10,0.1)", borderBottom: "1px solid rgba(200,30,10,0.2)" }}>
-            <span style={{ fontSize: 8, fontWeight: 900, letterSpacing: "0.3em", textTransform: "uppercase", color: "#e63320" }}>◆ STATUS : CLASSIFIED</span>
-            <div style={{ display: "flex", gap: 12 }}>
-              <button style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(209,213,219,0.5)", fontSize: 13, padding: 0, lineHeight: 1 }}>🔍</button>
-              <button style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(209,213,219,0.5)", fontSize: 13, padding: 0, lineHeight: 1 }}>🛍</button>
-            </div>
-          </div>
-          {/* Origin */}
-          <div style={{ padding: "5px 11px", borderBottom: "1px solid rgba(200,30,10,0.14)" }}>
-            <span style={{ fontSize: 8, fontWeight: 900, letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(209,213,219,0.55)", fontFamily: "'Barlow Condensed', sans-serif" }}>
-              {ORIGIN_FULL[subject.origin]}
-            </span>
-          </div>
+      {/* ── TOP TIER: TWO COLUMN GRID ── */}
+      <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: "10px", marginBottom: "10px" }}>
+        {/* Left: Main Sighting Photo */}
+        <div style={{ border: "1px solid #333", position: "relative", minHeight: "220px" }}>
+          <img
+            src={subject.sightingPhoto}
+            alt="Sighting"
+            onClick={() => setLightbox(subject.sightingPhoto)}
+            style={{ width: "100%", height: "100%", objectFit: "cover", filter: "contrast(1.2) grayscale(0.4)", cursor: "pointer" }}
+          />
         </div>
 
-        {/* ══ MAIN SECTION: LEFT scene photo + RIGHT text ══ */}
-        <div style={{ display: "flex", borderBottom: "1px solid rgba(200,30,10,0.18)", minHeight: 300 }}>
-
-          {/* LEFT: large atmospheric/scene/sighting photo */}
-          <div style={{ width: "42%", flexShrink: 0, borderRight: "1px solid rgba(200,30,10,0.18)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
-            {subject.sightingPhoto ? (
-              <>
-                {subject.sightingLabel && (
-                  <div style={{ padding: "4px 7px 3px", borderBottom: "1px solid rgba(200,30,10,0.1)" }}>
-                    <span style={{ fontSize: 6, fontStyle: "italic", color: "rgba(209,213,219,0.3)", letterSpacing: "0.04em", fontFamily: "'Barlow', sans-serif" }}>{subject.sightingLabel}</span>
-                  </div>
-                )}
-                <img
-                  className="click-photo"
-                  src={subject.sightingPhoto}
-                  alt="sighting"
-                  style={{ flex: 1, objectFit: "cover", minHeight: 280, filter: "contrast(1.08) saturate(0.7)" }}
-                  onClick={() => setLightbox(subject.sightingPhoto)}
-                />
-              </>
-            ) : (
-              <div style={{ flex: 1, minHeight: 280, background: "#0d0a0b", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <span style={{ fontSize: 7, color: "rgba(200,30,10,0.2)", letterSpacing: "0.3em", textTransform: "uppercase", writingMode: "vertical-rl" }}>NO VISUAL</span>
-              </div>
-            )}
-          </div>
-
-          {/* RIGHT: stacked text sections */}
-          <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-
-            {/* SUMMARY */}
-            {subject.summary && (
-              <div style={{ padding: "8px 8px", borderBottom: "1px solid rgba(200,30,10,0.14)" }}>
-                <span className="sl">SUMMARY</span>
-                <p className="para-text">{subject.summary}</p>
-              </div>
-            )}
-
-            {/* OBSERVATIONS */}
-            {subject.observations && (
-              <div style={{ padding: "8px 8px", borderBottom: "1px solid rgba(200,30,10,0.14)" }}>
-                <span className="sl">OBSERVATIONS</span>
-                <p className="para-text" style={{ color: "rgba(209,213,219,0.58)" }}>{subject.observations}</p>
-              </div>
-            )}
-
-            {/* ASSESSMENT */}
-            {subject.assessment && (
-              <div style={{ padding: "8px 8px", borderBottom: "1px solid rgba(200,30,10,0.14)" }}>
-                <span className="sl">ASSESSMENT</span>
-                <p className="para-text" style={{ color: "rgba(156,163,175,0.6)" }}>{subject.assessment}</p>
-              </div>
-            )}
-
-            {/* THREAT LEVEL */}
-            <div style={{ padding: "8px 8px", borderBottom: subject.abilities ? "1px solid rgba(200,30,10,0.14)" : "none" }}>
-              <span className="sl">THREAT LEVEL :</span>
-              <div style={{ fontSize: 42, fontWeight: 900, fontFamily: "'Barlow Condensed', sans-serif", color: "#e63320", lineHeight: 1, letterSpacing: "0.04em", textShadow: "0 0 18px rgba(230,51,32,0.4)" }}>{subject.threatLevel}</div>
-              <div style={{ fontSize: 7, color: "rgba(200,30,10,0.6)", letterSpacing: "0.12em", textTransform: "uppercase", marginTop: 2 }}>{subject.threat}</div>
-            </div>
-
-            {/* KNOWN ABILITIES */}
-            {subject.abilities && (
-              <div style={{ padding: "8px 8px" }}>
-                <span className="sl" style={{ color: "#a78bfa" }}>KNOWN ABILITIES :</span>
-                {subject.abilities.map(a => (
-                  <div key={a} style={{ fontSize: 6.5, color: "#c4b5fd", letterSpacing: "0.04em", textTransform: "uppercase", marginBottom: 3, paddingLeft: 6, borderLeft: "1px solid rgba(167,139,250,0.3)", lineHeight: 1.5, fontFamily: "'Courier New', monospace" }}>▸ {a}</div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* ══ BOTTOM CLASSIFICATION STRIP ══ */}
-        <div style={{ display: "flex", borderBottom: "1px solid rgba(200,30,10,0.18)" }}>
-
-          {/* Portrait photo (left) */}
-          <div style={{ width: "33%", flexShrink: 0, borderRight: "1px solid rgba(200,30,10,0.18)", overflow: "hidden" }}>
-            {subject.photo ? (
-              <img
-                className="click-photo"
-                src={subject.photo}
-                alt={subject.alias}
-                style={{ width: "100%", height: "100%", objectFit: "cover", minHeight: 140, filter: "contrast(1.08) saturate(0.72)" }}
-                onClick={() => setLightbox(subject.photo)}
-              />
-            ) : (
-              <div style={{ height: 140, background: "#0d0a0b", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <span style={{ fontSize: 7, color: "rgba(200,30,10,0.2)", letterSpacing: "0.2em", textTransform: "uppercase" }}>NO IMG</span>
-              </div>
-            )}
-          </div>
-
-          {/* Classification info (right) */}
-          <div style={{ flex: 1, padding: "7px 8px" }}>
-            <span className="sl">SUBJECT CLASSIFICATION</span>
-            <div style={{ fontSize: 6.5, color: "rgba(209,213,219,0.45)", textTransform: "uppercase", letterSpacing: "0.04em", lineHeight: 1.4, marginBottom: 1 }}>{subject.type}</div>
-            <div style={{ fontSize: 6.5, color: "rgba(209,213,219,0.55)", textTransform: "uppercase", letterSpacing: "0.04em", lineHeight: 1.4, marginBottom: 3 }}>{subject.classification}</div>
-            <div style={{ fontSize: 6, color: "rgba(209,213,219,0.3)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 4 }}>{ORIGIN_FULL[subject.origin]}</div>
-            <div className="br" />
-            <div style={{ fontSize: 6.5, color: "#f59e0b", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 2 }}>ALIAS: {subject.alias}</div>
-            <div style={{ fontSize: 5.5, color: "rgba(209,213,219,0.2)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 4 }}>{subject.caseRef}</div>
-            <div className="br" />
-            <span className="sl">PHYSICAL STATS</span>
-            {[["HEIGHT", subject.bio.height], ["WEIGHT", subject.bio.weight], ["BUILD", subject.bio.build], ["EYES", subject.bio.eyes]].map(([l, v]) => (
-              <div key={l} style={{ display: "flex", gap: 4, marginBottom: 2 }}>
-                <span style={{ fontSize: 6, color: "rgba(209,213,219,0.3)", textTransform: "uppercase", letterSpacing: "0.09em", minWidth: 32, flexShrink: 0, fontFamily: "'Courier New', monospace" }}>{l}:</span>
-                <span style={{ fontSize: 6, color: "rgba(209,213,219,0.75)", textTransform: "uppercase", letterSpacing: "0.04em", fontFamily: "'Courier New', monospace" }}>{v}</span>
-              </div>
-            ))}
-            {/* Panel entries */}
-            {subject.panel && subject.panel.entries.length > 0 && (
-              <>
-                <div className="br" />
-                <span className="sl">{subject.panel.title}</span>
-                <div style={{ fontSize: 6, color: sc, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 3 }}>STATUS: {subject.panelStatus}</div>
-                {subject.panel.entries.map(e => (
-                  <div key={e} className="ent" style={{ fontSize: 6 }}>{e}</div>
-                ))}
-              </>
-            )}
-          </div>
-        </div>
-
-        {/* ── BARCODE STRIP ── */}
-        <div style={{ background: "#050305", borderBottom: "1px solid rgba(200,30,10,0.1)", padding: "7px 11px", display: "flex", alignItems: "center", gap: 9 }}>
-          <div style={{ display: "flex", gap: 1.5, alignItems: "stretch", height: 20, flexShrink: 0 }}>
-            {[2,1,3,1,2,1,1,2,3,1,2,1,1,3,2,1,2,1,2,1,1,3,1,2].map((w, i) => (
-              <div key={i} style={{ width: w, background: i % 2 === 0 ? "rgba(209,213,219,0.5)" : "transparent" }} />
-            ))}
+        {/* Right: Summary / Observations / Assessment */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+          <div>
+            <span className="label-red">SUMMARY</span>
+            <p className="data-cyan" style={{fontSize: '9px'}}>{subject.summary}</p>
           </div>
           <div>
-            <div style={{ fontSize: 5.5, letterSpacing: "0.28em", textTransform: "uppercase", color: "rgba(209,213,219,0.28)" }}>FUSEDCORP ARCHIVES // INTERNAL DATABASE</div>
-            <div style={{ fontSize: 5, letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(209,213,219,0.12)", marginTop: 2 }}>{subject.id} // CLEARANCE LVL 4</div>
+            <span className="label-red">OBSERVATIONS</span>
+            <p className="data-cyan" style={{fontSize: '9px'}}>{subject.observations}</p>
+          </div>
+          <div>
+            <span className="label-red">ASSESSMENT</span>
+            <p className="data-cyan" style={{fontSize: '9px'}}>{subject.assessment}</p>
           </div>
         </div>
+      </div>
 
-        {/* ── FOOTER ── */}
-        <footer style={{ padding: "11px 12px 26px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
-            <button style={{ background: "none", border: "none", cursor: "pointer", padding: 0, opacity: 0.38 }}>
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05A6.34 6.34 0 003.15 15.3a6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.74a4.85 4.85 0 01-1.01-.05z" fill="#d1d5db"/></svg>
-            </button>
-            <button style={{ background: "none", border: "none", cursor: "pointer", padding: 0, opacity: 0.38 }}>
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><rect x="2" y="2" width="20" height="20" rx="5" stroke="#d1d5db" strokeWidth="2" fill="none"/><circle cx="12" cy="12" r="4" stroke="#d1d5db" strokeWidth="2" fill="none"/><circle cx="17.5" cy="6.5" r="1.5" fill="#d1d5db"/></svg>
-            </button>
+      {/* ── MIDDLE TIER: STATS BLOCK ── */}
+      <div className="border-red" style={{ padding: "8px", background: "rgba(204, 34, 0, 0.05)", marginBottom: "10px" }}>
+        <span className="label-red">SUBJECT CLASSIFICATION</span>
+        <div className="data-cyan">{subject.type}</div>
+        <div className="data-cyan" style={{borderBottom: '1px solid #333', paddingBottom: '4px', marginBottom: '4px'}}>
+            BASELINE BIOLOGY // {subject.classification}
+        </div>
+        
+        <div className={`data-white ${glitchActive ? 'glitch-active' : ''}`} style={{fontSize: '22px', fontWeight: '900'}}>
+          {subject.name}
+        </div>
+        <div className="label-red" style={{fontSize: '12px'}}>ALIAS : {subject.alias}</div>
+        <div style={{fontSize: '9px', color: '#444', marginBottom: '8px'}}>{subject.caseRef}</div>
+
+        <span className="label-red">PHYSICAL STATS</span>
+        <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+          {[
+            ["HEIGHT", subject.bio.height],
+            ["WEIGHT", subject.bio.weight],
+            ["AGE", `42 (DECEASED)`],
+            ["BUILD", subject.bio.build],
+            ["HAIR", "DARK BLONDE"],
+            ["EYES", subject.bio.eyes]
+          ].map(([label, val]) => (
+            <div key={label} style={{ display: "flex", borderBottom: "1px solid #1a1a1a" }}>
+              <span style={{ color: "#00ffff", width: "80px", fontSize: "9px" }}>{label}:</span>
+              <span className="data-white" style={{ fontSize: "9px" }}>{val}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── THIRD TIER: THREAT & ABILITIES ── */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+        <div>
+           <span className="label-red">THREAT LEVEL :</span>
+           <div style={{ fontSize: "40px", color: "#cc2200", fontWeight: "900", lineHeight: "1" }}>
+              {subject.threatLevel}
+           </div>
+           <div style={{fontSize: '8px', color: '#cc2200'}}>{subject.threat}</div>
+        </div>
+        <div>
+          <span className="label-red" style={{color: '#fff'}}>KNOWN ABILITIES</span>
+          <div className="data-cyan" style={{fontSize: '9px'}}>
+            {subject.abilities?.map(a => <div key={a}>+ {a}</div>)}
           </div>
+        </div>
+      </div>
+
+      {/* ── BOTTOM GALLERY ── */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "4px", marginTop: "10px" }}>
+        {[subject.photo, subject.sightingPhoto, subject.secondaryPhoto, ...(subject.extraPhotos || [])].filter(Boolean).map((src, i) => (
+          <img
+            key={i}
+            src={src}
+            alt={`photo-${i}`}
+            onClick={() => setLightbox(src)}
+            style={{ width: "100%", aspectRatio: "1", objectFit: "cover", border: "1px solid #333", cursor: "pointer", transition: "opacity 0.15s" }}
+            onMouseEnter={e => e.currentTarget.style.opacity = "0.75"}
+            onMouseLeave={e => e.currentTarget.style.opacity = "1"}
+          />
+        ))}
+      </div>
+
+      {/* ── FOOTER ── */}
+      <div style={{ marginTop: "15px", borderTop: "1px solid #333", paddingTop: "10px" }}>
+         <div style={{fontSize: '8px', color: 'rgba(0, 255, 255, 0.3)', textAlign: 'center'}}>
+            FUSEDCORP ARCHIVES // INTERNAL DATABASE // PORTAL ACCESS 06-X
+         </div>
+         <div style={{ display: "flex", justifyContent: "space-between", marginTop: "10px", alignItems: "center" }}>
+            <span style={{fontSize: '20px'}}>🤖 🎵 📸</span>
+            <button 
+              onClick={() => router.push("/archive")}
+              style={{ background: "#cc2200", color: "#fff", border: "none", padding: "5px 15px", fontWeight: "900", cursor: "pointer" }}
+            >
+              ← BACK
+            </button>
+         </div>
+      </div>
+      {/* ── LIGHTBOX ── */}
+      {lightbox && (
+        <div
+          onClick={() => setLightbox(null)}
+          style={{
+            position: "fixed", inset: 0, zIndex: 999,
+            background: "rgba(0,0,0,0.95)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            padding: "16px",
+          }}
+        >
+          <img
+            src={lightbox}
+            alt="fullscreen"
+            onClick={e => e.stopPropagation()}
+            style={{ maxWidth: "100%", maxHeight: "90vh", objectFit: "contain", border: "1px solid #cc2200" }}
+          />
           <button
-            onClick={() => router.push("/archive")}
-            style={{ background: "none", border: "1px solid rgba(200,30,10,0.5)", color: "#e63320", fontFamily: "'Barlow Condensed', sans-serif", fontSize: 10, fontWeight: 700, letterSpacing: "0.3em", textTransform: "uppercase", padding: "7px 18px", cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}
-          >
-            ← BACK
-          </button>
-        </footer>
-      </main>
-    </>
+            onClick={() => setLightbox(null)}
+            style={{
+              position: "absolute", top: "12px", right: "12px",
+              background: "#cc2200", color: "#fff", border: "none",
+              fontFamily: "'Courier New', monospace", fontWeight: 900,
+              fontSize: "10px", letterSpacing: "0.2em",
+              padding: "5px 12px", cursor: "pointer",
+            }}
+          >✕ CLOSE</button>
+        </div>
+      )}
+    </main>
   );
 }
