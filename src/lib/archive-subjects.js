@@ -18,6 +18,8 @@ export const ALL_SUBJECTS = [
     secondaryPhoto: null,
     secondaryPhotoLabel: null,
     extraPhotos: [],
+    summary: "Subject was a baseline human prior to chemical exposure incident. Following traumatic chemical burn injuries and forced psychological deterioration, subject initiated a series of escalating homicide events across multiple residential locations.",
+    observations: "Subject demonstrates minimal sleep dependency and elevated reflexes post-incident. Regenerative tendencies observed following injury. Nocturnal activity patterns confirmed. Abnormal resistance to fire-based stimuli logged across multiple field encounters.",
     bio: { height: "5'8\" // 173CM", weight: "143 LBS", build: "Lean", eyes: "Green" },
     caseNumber: "06-641-JW",
     panel: {
@@ -74,6 +76,8 @@ export const ALL_SUBJECTS = [
     secondaryPhoto: null,
     secondaryPhotoLabel: null,
     extraPhotos: [],
+    summary: "Post-augmentation military operative. Subject underwent voluntary cyborg augmentation under FusedCorp military contract. Currently ranked Colonel with a distinguished service record spanning three active combat campaigns.",
+    observations: "Subject demonstrates enhanced combat efficiency and elevated strength post-augmentation. Emotional detachment disorder noted in quarterly psychological evaluations. Altered pain threshold and thermal resilience confirmed in field conditions.",
     bio: { height: "6'2\" // 188CM", weight: "310 LBS", build: "Carbon enhanced", eyes: "Dark Brown" },
     caseNumber: "AKR-800-001",
     panel: {
@@ -122,6 +126,8 @@ export const ALL_SUBJECTS = [
     secondaryPhoto: null,
     secondaryPhotoLabel: null,
     extraPhotos: [],
+    summary: "Engineered combat unit produced by FusedCorp. MCR-1 was designed for high-risk field operations with full autonomous capability. Unit has since demonstrated behaviour patterns inconsistent with base programming directives.",
+    observations: "Unit exhibits human identity disorder and autonomy syndrome. Self-repair protocol remains active. Deviation events logged during three separate field deployments. Containment protocols currently under review by FusedCorp High Command.",
     bio: { height: "6'8\" // 203CM", weight: "348 LBS", build: "Kevlar / Tungsten", eyes: "N/A" },
     caseNumber: "MCR-FC-003",
     panel: {
@@ -170,6 +176,8 @@ export const ALL_SUBJECTS = [
     secondaryPhoto: null,
     secondaryPhotoLabel: null,
     extraPhotos: [],
+    summary: "Post-life entity linked to residential property. Subject James Barker was confirmed deceased prior to manifestation events. Current entity maintains a persistent presence across multiple sighting locations tied to the original incident.",
+    observations: "Persistent electromagnetic interference and environmental temperature drops logged at all sighting locations. Multiple light emission events and infrared anomalies detected. Nine witness accounts currently on record. Telekinetic activity confirmed.",
     bio: { height: "5'11\"", weight: "REGULAR", build: "Regular", eyes: "Ice Blue" },
     caseNumber: "06-41-049-IN",
     panel: {
@@ -218,6 +226,8 @@ export const ALL_SUBJECTS = [
     secondaryPhoto: null,
     secondaryPhotoLabel: null,
     extraPhotos: [],
+    summary: "[REDACTED BY ORDER OF FUSEDCORP HIGH COMMAND — CLEARANCE LEVEL 6 REQUIRED]",
+    observations: "[DATA EXPUNGED — CLEARANCE LEVEL 6 REQUIRED]",
     bio: { height: "UNDETERMINED", weight: "UNDETERMINED", build: "UNVERIFIED", eyes: "UNDETERMINED" },
     caseNumber: "[CLASSIFIED]",
     panel: {

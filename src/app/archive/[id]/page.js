@@ -89,7 +89,7 @@ export default function SubjectDossierPage() {
         }
 
         .ent {
-          font-size: 7px;
+          font-size: 6.5px;
           color: rgba(209,213,219,0.72);
           letter-spacing: 0.04em;
           text-transform: uppercase;
@@ -100,7 +100,7 @@ export default function SubjectDossierPage() {
           font-family: 'Courier New', monospace;
         }
 
-        .br { height: 1px; background: rgba(200,30,10,0.14); margin: 6px 0; }
+        .br { height: 1px; background: rgba(200,30,10,0.14); margin: 5px 0; }
 
         .click-photo {
           display: block;
@@ -109,6 +109,16 @@ export default function SubjectDossierPage() {
           transition: filter 0.15s ease;
         }
         .click-photo:hover { filter: brightness(1.15) !important; }
+
+        .para-text {
+          font-size: 6.5px;
+          color: rgba(209,213,219,0.68);
+          line-height: 1.7;
+          text-transform: uppercase;
+          letter-spacing: 0.03em;
+          margin: 0;
+          font-family: 'Courier New', monospace;
+        }
       `}</style>
 
       {lightbox && <Lightbox src={lightbox} onClose={() => setLightbox(null)} />}
@@ -143,133 +153,129 @@ export default function SubjectDossierPage() {
           </div>
         </div>
 
-        {/* ══ TOP PHOTOS ROW ══ */}
-        <div style={{ display: "flex", borderBottom: "1px solid rgba(200,30,10,0.18)" }}>
-          {/* Left: sighting photo */}
-          {subject.sightingPhoto ? (
-            <div style={{ flex: 1, borderRight: subject.photo ? "1px solid rgba(200,30,10,0.18)" : "none", display: "flex", flexDirection: "column" }}>
-              {subject.sightingLabel && (
-                <div style={{ padding: "4px 7px 2px" }}>
-                  <span style={{ fontSize: 6.5, fontStyle: "italic", color: "rgba(209,213,219,0.35)", letterSpacing: "0.04em", fontFamily: "'Barlow', sans-serif" }}>{subject.sightingLabel}</span>
-                </div>
-              )}
-              <img className="click-photo" src={subject.sightingPhoto} alt="sighting"
-                style={{ flex: 1, objectFit: "cover", filter: "contrast(1.08) saturate(0.7)" }}
-                onClick={() => setLightbox(subject.sightingPhoto)} />
-            </div>
-          ) : !subject.photo ? (
-            <div style={{ flex: 1, height: 140, background: "#0d0a0b", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <span style={{ fontSize: 8, color: "rgba(200,30,10,0.18)", letterSpacing: "0.3em", textTransform: "uppercase" }}>NO VISUAL</span>
-            </div>
-          ) : null}
+        {/* ══ MAIN SECTION: LEFT scene photo + RIGHT text ══ */}
+        <div style={{ display: "flex", borderBottom: "1px solid rgba(200,30,10,0.18)", minHeight: 300 }}>
 
-          {/* Right: main portrait photo */}
-          {subject.photo && (
-            <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
-              {subject.photoLabel && (
-                <div style={{ padding: "4px 7px 2px" }}>
-                  <span style={{ fontSize: 6.5, fontStyle: "italic", color: "rgba(209,213,219,0.35)", letterSpacing: "0.04em", fontFamily: "'Barlow', sans-serif" }}>{subject.photoLabel}</span>
-                </div>
-              )}
-              <img className="click-photo" src={subject.photo} alt={subject.alias}
-                style={{ flex: 1, objectFit: "cover", filter: "contrast(1.08) saturate(0.72)" }}
-                onClick={() => setLightbox(subject.photo)} />
-            </div>
-          )}
-        </div>
-
-        {/* ══ MAIN BODY: two columns of text ══ */}
-        <div style={{ display: "flex", borderBottom: "1px solid rgba(200,30,10,0.18)" }}>
-
-          {/* LEFT COLUMN (43%) */}
-          <div style={{ width: "43%", flexShrink: 0, borderRight: "1px solid rgba(200,30,10,0.18)", display: "flex", flexDirection: "column" }}>
-
-            {/* Classification */}
-            <div style={{ padding: "7px 7px 5px", borderBottom: "1px solid rgba(200,30,10,0.14)" }}>
-              <span className="sl">SUBJECT CLASSIFICATION</span>
-              <div style={{ fontSize: 7, color: "rgba(209,213,219,0.45)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>{subject.type}</div>
-              <div style={{ fontSize: 7, color: "rgba(209,213,219,0.6)", textTransform: "uppercase", letterSpacing: "0.04em", lineHeight: 1.4, marginBottom: 4 }}>{subject.classification}</div>
-              <div style={{ fontSize: 6.5, color: "#f59e0b", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 2 }}>ALIAS: {subject.alias}</div>
-              <div style={{ fontSize: 6, color: "rgba(209,213,219,0.25)", textTransform: "uppercase", letterSpacing: "0.07em" }}>{subject.caseRef}</div>
-            </div>
-
-            {/* Biological profile */}
-            <div style={{ padding: "6px 7px" }}>
-              <span className="sl">BIOLOGICAL PROFILE</span>
-              {[["HEIGHT", subject.bio.height], ["WEIGHT", subject.bio.weight], ["BUILD", subject.bio.build], ["EYES", subject.bio.eyes]].map(([l, v]) => (
-                <div key={l} style={{ display: "flex", gap: 4, marginBottom: 3 }}>
-                  <span style={{ fontSize: 6.5, color: "rgba(209,213,219,0.32)", textTransform: "uppercase", letterSpacing: "0.09em", minWidth: 34, flexShrink: 0, fontFamily: "'Courier New', monospace" }}>{l}:</span>
-                  <span style={{ fontSize: 6.5, color: "rgba(209,213,219,0.78)", textTransform: "uppercase", letterSpacing: "0.04em", fontFamily: "'Courier New', monospace" }}>{v}</span>
-                </div>
-              ))}
-            </div>
+          {/* LEFT: large atmospheric/scene/sighting photo */}
+          <div style={{ width: "42%", flexShrink: 0, borderRight: "1px solid rgba(200,30,10,0.18)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+            {subject.sightingPhoto ? (
+              <>
+                {subject.sightingLabel && (
+                  <div style={{ padding: "4px 7px 3px", borderBottom: "1px solid rgba(200,30,10,0.1)" }}>
+                    <span style={{ fontSize: 6, fontStyle: "italic", color: "rgba(209,213,219,0.3)", letterSpacing: "0.04em", fontFamily: "'Barlow', sans-serif" }}>{subject.sightingLabel}</span>
+                  </div>
+                )}
+                <img
+                  className="click-photo"
+                  src={subject.sightingPhoto}
+                  alt="sighting"
+                  style={{ flex: 1, objectFit: "cover", minHeight: 280, filter: "contrast(1.08) saturate(0.7)" }}
+                  onClick={() => setLightbox(subject.sightingPhoto)}
+                />
+              </>
+            ) : (
+              <div style={{ flex: 1, minHeight: 280, background: "#0d0a0b", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <span style={{ fontSize: 7, color: "rgba(200,30,10,0.2)", letterSpacing: "0.3em", textTransform: "uppercase", writingMode: "vertical-rl" }}>NO VISUAL</span>
+              </div>
+            )}
           </div>
 
-          {/* RIGHT COLUMN */}
-          <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+          {/* RIGHT: stacked text sections */}
+          <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
 
-            {/* Panel */}
-            <div style={{ padding: "7px 8px", borderBottom: "1px solid rgba(200,30,10,0.14)" }}>
-              <span className="sl">{subject.panel.title}</span>
-              <div style={{ fontSize: 6.5, color: sc, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 5 }}>STATUS: {subject.panelStatus}</div>
-              {subject.panel.entries.map(e => <div key={e} className="ent">{e}</div>)}
-            </div>
+            {/* SUMMARY */}
+            {subject.summary && (
+              <div style={{ padding: "8px 8px", borderBottom: "1px solid rgba(200,30,10,0.14)" }}>
+                <span className="sl">SUMMARY</span>
+                <p className="para-text">{subject.summary}</p>
+              </div>
+            )}
 
-            {/* Threat level */}
-            <div style={{ padding: "7px 8px", borderBottom: "1px solid rgba(200,30,10,0.14)" }}>
+            {/* OBSERVATIONS */}
+            {subject.observations && (
+              <div style={{ padding: "8px 8px", borderBottom: "1px solid rgba(200,30,10,0.14)" }}>
+                <span className="sl">OBSERVATIONS</span>
+                <p className="para-text" style={{ color: "rgba(209,213,219,0.58)" }}>{subject.observations}</p>
+              </div>
+            )}
+
+            {/* ASSESSMENT */}
+            {subject.assessment && (
+              <div style={{ padding: "8px 8px", borderBottom: "1px solid rgba(200,30,10,0.14)" }}>
+                <span className="sl">ASSESSMENT</span>
+                <p className="para-text" style={{ color: "rgba(156,163,175,0.6)" }}>{subject.assessment}</p>
+              </div>
+            )}
+
+            {/* THREAT LEVEL */}
+            <div style={{ padding: "8px 8px", borderBottom: subject.abilities ? "1px solid rgba(200,30,10,0.14)" : "none" }}>
               <span className="sl">THREAT LEVEL :</span>
-              <div style={{ fontSize: 44, fontWeight: 900, fontFamily: "'Barlow Condensed', sans-serif", color: "#e63320", lineHeight: 1, letterSpacing: "0.04em", textShadow: "0 0 18px rgba(230,51,32,0.4)" }}>{subject.threatLevel}</div>
+              <div style={{ fontSize: 42, fontWeight: 900, fontFamily: "'Barlow Condensed', sans-serif", color: "#e63320", lineHeight: 1, letterSpacing: "0.04em", textShadow: "0 0 18px rgba(230,51,32,0.4)" }}>{subject.threatLevel}</div>
+              <div style={{ fontSize: 7, color: "rgba(200,30,10,0.6)", letterSpacing: "0.12em", textTransform: "uppercase", marginTop: 2 }}>{subject.threat}</div>
             </div>
 
-            {/* Condition notes */}
-            <div style={{ padding: "7px 8px", borderBottom: "1px solid rgba(200,30,10,0.14)" }}>
-              <span className="sl">CONDITION NOTES:</span>
-              {subject.conditions.map(c => <div key={c} className="ent">{c}</div>)}
-            </div>
-
-            {/* Psychological */}
-            <div style={{ padding: "7px 8px", borderBottom: "1px solid rgba(200,30,10,0.14)" }}>
-              <span className="sl">PSYCHOLOGICAL STATE:</span>
-              {subject.psych.map(p => <div key={p} className="ent">{p}</div>)}
-            </div>
-
-            {/* Abilities */}
+            {/* KNOWN ABILITIES */}
             {subject.abilities && (
-              <div style={{ padding: "7px 8px", borderBottom: "1px solid rgba(200,30,10,0.14)" }}>
-                <span className="sl" style={{ color: "#a78bfa" }}>KNOWN ABILITIES:</span>
+              <div style={{ padding: "8px 8px" }}>
+                <span className="sl" style={{ color: "#a78bfa" }}>KNOWN ABILITIES :</span>
                 {subject.abilities.map(a => (
-                  <div key={a} style={{ fontSize: 7, color: "#c4b5fd", letterSpacing: "0.04em", textTransform: "uppercase", marginBottom: 3, paddingLeft: 6, borderLeft: "1px solid rgba(167,139,250,0.3)", lineHeight: 1.45, fontFamily: "'Courier New', monospace" }}>▸ {a}</div>
+                  <div key={a} style={{ fontSize: 6.5, color: "#c4b5fd", letterSpacing: "0.04em", textTransform: "uppercase", marginBottom: 3, paddingLeft: 6, borderLeft: "1px solid rgba(167,139,250,0.3)", lineHeight: 1.5, fontFamily: "'Courier New', monospace" }}>▸ {a}</div>
                 ))}
               </div>
             )}
-
-            {/* Assessment */}
-            {subject.assessment && (
-              <div style={{ padding: "7px 8px", flex: 1 }}>
-                <span className="sl">ASSESSMENT</span>
-                <p style={{ fontSize: 7, color: "rgba(156,163,175,0.65)", lineHeight: 1.65, textTransform: "uppercase", letterSpacing: "0.03em", margin: 0 }}>{subject.assessment}</p>
-              </div>
-            )}
           </div>
         </div>
 
-        {/* ══ BOTTOM PHOTOS ROW ══ */}
-        {(subject.secondaryPhoto || (subject.extraPhotos && subject.extraPhotos.length > 0)) && (
-          <div style={{ display: "flex", borderBottom: "1px solid rgba(200,30,10,0.18)" }}>
-            {[subject.secondaryPhoto, ...(subject.extraPhotos || [])].filter(Boolean).map((src, i, arr) => (
-              <div key={i} style={{ flex: 1, borderRight: i < arr.length - 1 ? "1px solid rgba(200,30,10,0.18)" : "none", display: "flex", flexDirection: "column" }}>
-                {subject.secondaryPhotoLabel && i === 0 && (
-                  <div style={{ padding: "4px 7px 2px" }}>
-                    <span style={{ fontSize: 6.5, fontStyle: "italic", color: "rgba(209,213,219,0.35)", letterSpacing: "0.04em", fontFamily: "'Barlow', sans-serif" }}>{subject.secondaryPhotoLabel}</span>
-                  </div>
-                )}
-                <img className="click-photo" src={src} alt={`photo-${i}`}
-                  style={{ objectFit: "cover", filter: "contrast(1.08) saturate(0.68)" }}
-                  onClick={() => setLightbox(src)} />
+        {/* ══ BOTTOM CLASSIFICATION STRIP ══ */}
+        <div style={{ display: "flex", borderBottom: "1px solid rgba(200,30,10,0.18)" }}>
+
+          {/* Portrait photo (left) */}
+          <div style={{ width: "33%", flexShrink: 0, borderRight: "1px solid rgba(200,30,10,0.18)", overflow: "hidden" }}>
+            {subject.photo ? (
+              <img
+                className="click-photo"
+                src={subject.photo}
+                alt={subject.alias}
+                style={{ width: "100%", height: "100%", objectFit: "cover", minHeight: 140, filter: "contrast(1.08) saturate(0.72)" }}
+                onClick={() => setLightbox(subject.photo)}
+              />
+            ) : (
+              <div style={{ height: 140, background: "#0d0a0b", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <span style={{ fontSize: 7, color: "rgba(200,30,10,0.2)", letterSpacing: "0.2em", textTransform: "uppercase" }}>NO IMG</span>
+              </div>
+            )}
+          </div>
+
+          {/* Classification info (right) */}
+          <div style={{ flex: 1, padding: "7px 8px" }}>
+            <span className="sl">SUBJECT CLASSIFICATION</span>
+            <div style={{ fontSize: 6.5, color: "rgba(209,213,219,0.45)", textTransform: "uppercase", letterSpacing: "0.04em", lineHeight: 1.4, marginBottom: 1 }}>{subject.type}</div>
+            <div style={{ fontSize: 6.5, color: "rgba(209,213,219,0.55)", textTransform: "uppercase", letterSpacing: "0.04em", lineHeight: 1.4, marginBottom: 3 }}>{subject.classification}</div>
+            <div style={{ fontSize: 6, color: "rgba(209,213,219,0.3)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 4 }}>{ORIGIN_FULL[subject.origin]}</div>
+            <div className="br" />
+            <div style={{ fontSize: 6.5, color: "#f59e0b", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 2 }}>ALIAS: {subject.alias}</div>
+            <div style={{ fontSize: 5.5, color: "rgba(209,213,219,0.2)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 4 }}>{subject.caseRef}</div>
+            <div className="br" />
+            <span className="sl">PHYSICAL STATS</span>
+            {[["HEIGHT", subject.bio.height], ["WEIGHT", subject.bio.weight], ["BUILD", subject.bio.build], ["EYES", subject.bio.eyes]].map(([l, v]) => (
+              <div key={l} style={{ display: "flex", gap: 4, marginBottom: 2 }}>
+                <span style={{ fontSize: 6, color: "rgba(209,213,219,0.3)", textTransform: "uppercase", letterSpacing: "0.09em", minWidth: 32, flexShrink: 0, fontFamily: "'Courier New', monospace" }}>{l}:</span>
+                <span style={{ fontSize: 6, color: "rgba(209,213,219,0.75)", textTransform: "uppercase", letterSpacing: "0.04em", fontFamily: "'Courier New', monospace" }}>{v}</span>
               </div>
             ))}
+            {/* Panel entries */}
+            {subject.panel && subject.panel.entries.length > 0 && (
+              <>
+                <div className="br" />
+                <span className="sl">{subject.panel.title}</span>
+                <div style={{ fontSize: 6, color: sc, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 3 }}>STATUS: {subject.panelStatus}</div>
+                {subject.panel.entries.map(e => (
+                  <div key={e} className="ent" style={{ fontSize: 6 }}>{e}</div>
+                ))}
+              </>
+            )}
           </div>
-        )}
+        </div>
 
         {/* ── BARCODE STRIP ── */}
         <div style={{ background: "#050305", borderBottom: "1px solid rgba(200,30,10,0.1)", padding: "7px 11px", display: "flex", alignItems: "center", gap: 9 }}>
