@@ -57,8 +57,6 @@ function ProductCard({ product, onSelect, isStripe }) {
             transform: hovered ? "scale(1.04)" : "scale(1)",
             transition: "transform 0.45s cubic-bezier(0.22,1,0.36,1)",
             display: "block",
-            WebkitMaskImage: "linear-gradient(to bottom, black 58%, transparent 68%)",
-            maskImage: "linear-gradient(to bottom, black 58%, transparent 68%)",
           }}
         />
         {product.note && (
